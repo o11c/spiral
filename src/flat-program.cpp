@@ -1,0 +1,66 @@
+#include "flat-program.hpp"
+
+#include <cstdio>
+
+#include "error.hpp"
+#include "gl_wrap.hpp"
+#include "uniforms.hpp"
+
+namespace encv
+{
+    mat4 ModelView;
+    mat4 Projection;
+    vec3 flat_color = {1, 1, 1};
+}
+
+FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
+: vs(v), fs(f)
+{
+    program = glCreateProgram();
+    glAttachShader(program, vs->shader);
+    glAttachShader(program, fs->shader);
+
+    glLinkProgram(program);
+
+    GLint length = 0;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+    if (length > 1)
+    {
+        GLchar buf[length];
+        glGetProgramInfoLog(program, length, &length, buf);
+        printf("linking flat program:\n%s\n\n", buf);
+    }
+
+    GLint success = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success)
+        barf();
+
+#define ATTRIBUTE(name, type)                               \
+    name##Attribute = glGetAttribLocation(program, #name);  \
+    if (name##Attribute == -1) barf();
+#define UNIFORM(name, type)                                 \
+    name##Uniform = glGetUniformLocation(program, #name);   \
+    if (name##Uniform == -1) barf();
+#include "vertex-flat.glsl.def"
+#undef ATTRIBUTE
+#undef UNIFORM
+}
+
+FlatProgram::~FlatProgram()
+{
+    glDeleteProgram(program);
+}
+
+void FlatProgram::load()
+{
+    auto& flat_colorValue = encv::flat_color;
+    mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
+
+    glUseProgram(program);
+#define ATTRIBUTE(name, type)   /**/
+#define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
+#include "vertex-flat.glsl.def"
+#undef ATTRIBUTE
+#undef UNIFORM
+}
