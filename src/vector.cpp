@@ -49,6 +49,16 @@ vec3& operator *= (vec3& V, float s)
     V.z *= s;
     return V;
 }
+vec3 operator * (vec3 v, float s)
+{
+    v *= s;
+    return v;
+}
+vec3 operator * (float s, vec3 v)
+{
+    v *= s;
+    return v;
+}
 
 float dot(const vec3& l, const vec3& r)
 {

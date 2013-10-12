@@ -3,12 +3,42 @@
 
 #include "../config.h"
 
+#include <cmath>
 #include <cstdio>
 
 #include "spine.hpp"
 
 
 Drawing *root_object = nullptr;
+const float rho = 500;
+float theta = 45 * M_PI/180, phi = 45 * M_PI/180;
+int sx, sy;
+
+static
+void drag(int x, int y)
+{
+    if (x == sx and y == sy)
+        return;
+    // one degree per pixel should be manageable
+    theta -= (x - sx) * M_PI / 180;
+    phi -= (y - sy) * M_PI / 180;
+    glutPostRedisplay();
+    sx = x;
+    sy = y;
+}
+
+static
+void mouse(int button, int state, int x, int y)
+{
+    (void)button;
+    if (state == GLUT_DOWN)
+    {
+        sx = x;
+        sy = y;
+        return;
+    }
+    drag(x, y);
+}
 
 static
 void display()
@@ -16,7 +46,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     encv::ModelView = mat4();
     encv::ModelView.lookat(
-            {250, 250, 250},
+            rho * vec3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi)),
             {0, 0, 0},
             {0, 0, 1});
     encv::Projection = mat4();
@@ -50,6 +80,8 @@ void init_glut(int argc, char **argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(drag);
 #if HAVE_FREEGLUT
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
             GLUT_ACTION_CONTINUE_EXECUTION);

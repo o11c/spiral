@@ -103,6 +103,8 @@ public:
 vec3 operator - (const vec3&, const vec3&);
 vec3 operator -(const vec3&);
 vec3& operator *= (vec3&, float);
+vec3 operator * (vec3, float);
+vec3 operator * (float, vec3);
 
 float dot(const vec3& l, const vec3& r);
 float dot(const vec4& l, const vec4& r);
