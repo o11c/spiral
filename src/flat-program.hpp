@@ -10,7 +10,6 @@ namespace encv
 {
     extern mat4 ModelView;
     extern mat4 Projection;
-    extern vec3 flat_color;
 }
 
 class FlatProgram

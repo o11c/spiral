@@ -6,13 +6,73 @@
 #include <cmath>
 #include <cstdio>
 
+#include <limits>
+
 #include "spine.hpp"
+
+const float UP_SCALE  = (16.f/15.f);
+const float DOWN_SCALE = (15.f/16.f);
+
+static
+void inc(float& f, float high)
+{
+    if (f < high)
+        f *= UP_SCALE;
+}
+
+static
+void dec(float low, float& f)
+{
+    if (low < f)
+        f *= DOWN_SCALE;
+}
+
+static
+void inc(int& i, int high)
+{
+    if (i < high)
+        i++;
+}
+
+static
+void dec(int low, int& i)
+{
+    if (low < i)
+        i--;
+}
+
+static
+void toggle(bool& b)
+{
+    b = not b;
+}
 
 
 Drawing *root_object = nullptr;
-const float rho = 500;
-float theta = 45 * M_PI/180, phi = 45 * M_PI/180;
+Spine *the_spine = nullptr;
+
+float rho;
+float theta, phi;
 int sx, sy;
+
+static
+void reset()
+{
+    rho = 500;
+    theta = 45 * M_PI/180;
+    phi = 45 * M_PI/180;
+    the_spine->a = 100;
+    the_spine->b = 40;
+    the_spine->r = 10;
+    the_spine->p = 2;
+    the_spine->q = 5;
+    the_spine->n = 10;
+    the_spine->m = 10;
+
+    the_spine->spine = true;
+    the_spine->mesh_rings = true;
+    the_spine->mesh_longs = true;
+}
 
 static
 void drag(int x, int y)
@@ -22,6 +82,9 @@ void drag(int x, int y)
     // one degree per pixel should be manageable
     theta -= (x - sx) * M_PI / 180;
     phi -= (y - sy) * M_PI / 180;
+    float epsilon = std::numeric_limits<float>::epsilon() * M_PI;
+    if (phi < epsilon) phi = epsilon;
+    if (phi > M_PI - epsilon) phi = M_PI - epsilon;
     glutPostRedisplay();
     sx = x;
     sy = y;
@@ -30,7 +93,22 @@ void drag(int x, int y)
 static
 void mouse(int button, int state, int x, int y)
 {
-    (void)button;
+    // glutMouseWheelFunc does not actually work
+    // they are always delivered as button events
+    if (button == 3)
+    {
+        dec(1e1, rho);
+        glutPostRedisplay();
+        return;
+    }
+    if (button == 4)
+    {
+        inc(rho, 1e4);
+        glutPostRedisplay();
+        return;
+    }
+
+    // normal button events
     if (state == GLUT_DOWN)
     {
         sx = x;
@@ -50,7 +128,8 @@ void display()
             {0, 0, 0},
             {0, 0, 1});
     encv::Projection = mat4();
-    encv::Projection.perspective(40, 1, 1.0, 1000.0);
+    // no matter what I do, this seems to break down when rho < about 150
+    encv::Projection.perspective(40, 1, rho / 50, rho * 2);
     if (root_object)
         root_object->draw();
     glutSwapBuffers();
@@ -59,14 +138,60 @@ void display()
 static
 void reshape(int w, int h)
 {
-    glViewport(0,0, w,h);
+    if (w > h)
+    {
+        int d = (w - h) / 2;
+        glViewport(d,0, h,h);
+    }
+    else
+    {
+        int d = (h - w) / 2;
+        glViewport(0,d, w,w);
+    }
 }
 
 static
 void keyboard(unsigned char key, int, int)
 {
-    if (key == '\e')
+    switch (key)
+    {
+    case '\e':
         glutLeaveMainLoop();
+        return;
+    case '0':
+        reset();
+        break;
+    case '1':
+        toggle(the_spine->spine);
+        break;
+    case '2':
+        toggle(the_spine->mesh_rings);
+        toggle(the_spine->mesh_longs);
+        break;
+    case '8':
+        toggle(the_spine->mesh_rings);
+        break;
+    case '9':
+        toggle(the_spine->mesh_longs);
+        break;
+    case 'a': dec(1, the_spine->a); break;
+    case 'A': inc(the_spine->a, 1e3); break;
+    case 'b': dec(1, the_spine->b); break;
+    case 'B': inc(the_spine->b, 1e3); break;
+    case 'r': dec(1, the_spine->r); break;
+    case 'R': inc(the_spine->r, 1e3); break;
+    case 'p': dec(1, the_spine->p); break;
+    case 'P': inc(the_spine->p, 100); break;
+    case 'q': dec(1, the_spine->q); break;
+    case 'Q': inc(the_spine->q, 100); break;
+    case 'n': dec(3, the_spine->n); break;
+    case 'N': inc(the_spine->n, 100); break;
+    case 'm': dec(3, the_spine->m); break;
+    case 'M': inc(the_spine->m, 100); break;
+    default:
+        return;
+    }
+    glutPostRedisplay();
 }
 
 static
@@ -85,6 +210,8 @@ void init_glut(int argc, char **argv)
 #if HAVE_FREEGLUT
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
             GLUT_ACTION_CONTINUE_EXECUTION);
+#else
+    printf("You suck - no mouse wheel or soft exit\n");
 #endif
 }
 
@@ -97,14 +224,18 @@ int main(int argc, char **argv)
     FlatProgram p(&vs, &fs);
     Spine spine(&p);
     root_object = &spine;
+    the_spine = &spine;
 
-    glClearColor(0.5, 0.0, 0.0, 1.0);
+    // the donut is reddish, so make the background the opposite
+    glClearColor(0.0, 0.05, 0.05, 1.0);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    reset();
     glutMainLoop();
 
+    the_spine = nullptr;
     root_object = nullptr;
     puts("Everything is OK");
 }

@@ -9,9 +9,12 @@ MAIN_OBJECTS := $(filter %-main.o,${ALL_OBJECTS})
 NORM_OBJECTS := $(filter-out %-main.o,${ALL_OBJECTS})
 PROGRAMS := $(patsubst obj/%-main.o,bin/%,${MAIN_OBJECTS})
 
-CXXFLAGS = -g -O2
+CXXFLAGS = -g -O2 -march=native
 CXXFLAGS += ${WARNINGS}
+
 override CXX += -std=c++0x
+override CXXFLAGS += -fvisibility=hidden
+
 WARNINGS := -Wall -Wextra -Wformat -Wunused
 WARNINGS += -Werror=missing-declarations -Werror=redundant-decls
 

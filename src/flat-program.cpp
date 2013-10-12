@@ -10,7 +10,6 @@ namespace encv
 {
     mat4 ModelView;
     mat4 Projection;
-    vec3 flat_color = {1, 1, 1};
 }
 
 FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
@@ -54,7 +53,6 @@ FlatProgram::~FlatProgram()
 
 void FlatProgram::load()
 {
-    auto& flat_colorValue = encv::flat_color;
     mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
 
     glUseProgram(program);
