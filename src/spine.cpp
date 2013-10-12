@@ -5,6 +5,20 @@
 #include "gl_wrap.hpp"
 #include "vector.hpp"
 
+
+Spine::Spine(FlatProgram *fp)
+: flat_program(fp)
+, dirty_spine(true)
+, dirty_mesh(true)
+{
+    glGenBuffers(4, &spine_points);
+}
+
+Spine::~Spine()
+{
+    glDeleteBuffers(4, &spine_points);
+}
+
 vec3 Spine::C(float t)
 {
     float x = (a + b * cos(q * t)) * cos(p * t);
@@ -55,13 +69,9 @@ void Spine::draw_spine()
     flat_program->load();
 
     int N = n * p * q;
-    // this is terrible use of buffers, but I have more important things
-    // to worry about right now.
-    GLuint point_buf;
-    GLuint param_buf;
+    if (dirty_spine)
     {
-        glGenBuffers(1, &point_buf);
-        glGenBuffers(1, &param_buf);
+        dirty_spine = false;
         vec3 points[N];
         vec2 params[N];
         for (int i = 0; i < N; ++i)
@@ -70,11 +80,11 @@ void Spine::draw_spine()
             params[i] = {t, 0};
             points[i] = C(t);
         }
-        glBindBuffer(GL_ARRAY_BUFFER, point_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, spine_points);
         glBufferData(GL_ARRAY_BUFFER,
                 sizeof(points), points,
                 GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, param_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, spine_params);
         glBufferData(GL_ARRAY_BUFFER,
                 sizeof(params), params,
                 GL_STATIC_DRAW);
@@ -82,19 +92,15 @@ void Spine::draw_spine()
     {
         glEnableVertexAttribArray(flat_program->vertexPositionAttribute);
         glEnableVertexAttribArray(flat_program->paramAttribute);
-        glBindBuffer(GL_ARRAY_BUFFER, point_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, spine_points);
         glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
-        glBindBuffer(GL_ARRAY_BUFFER, param_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, spine_params);
         glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glDrawArrays(GL_LINE_LOOP, 0, N);
         glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
         glDisableVertexAttribArray(flat_program->paramAttribute);
-    }
-    {
-        glDeleteBuffers(1, &point_buf);
-        glDeleteBuffers(1, &param_buf);
     }
 }
 
@@ -104,13 +110,9 @@ void Spine::draw_mesh()
 
     int N = n * p * q;
     int M = m;
-    // this is terrible use of buffers, but I have more important things
-    // to worry about right now.
-    GLuint point_buf;
-    GLuint param_buf;
+    if (dirty_mesh)
     {
-        glGenBuffers(1, &point_buf);
-        glGenBuffers(1, &param_buf);
+        dirty_mesh = false;
         vec3 points[N * M];
         vec2 params[N * M];
         for (int i = 0; i < N; ++i)
@@ -128,11 +130,11 @@ void Spine::draw_mesh()
                 points[i * M + j] = Ct + r * (cos(u) * Bt + sin(u) * Nt);
             }
         }
-        glBindBuffer(GL_ARRAY_BUFFER, point_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
         glBufferData(GL_ARRAY_BUFFER,
                 sizeof(points), points,
                 GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, param_buf);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
         glBufferData(GL_ARRAY_BUFFER,
                 sizeof(params), params,
                 GL_STATIC_DRAW);
@@ -149,10 +151,10 @@ void Spine::draw_mesh()
             // 11111
             //      22222
             //           33333
-            glBindBuffer(GL_ARRAY_BUFFER, point_buf);
+            glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
             glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                     0, (GLvoid*) 0);
-            glBindBuffer(GL_ARRAY_BUFFER, param_buf);
+            glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
             glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                     0, (GLvoid*) 0);
             for (int i = 0; i < N; ++i)
@@ -173,10 +175,10 @@ void Spine::draw_mesh()
             //     5    5    5
             for (int j = 0; j < M; ++j)
             {
-                glBindBuffer(GL_ARRAY_BUFFER, point_buf);
+                glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
                 glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                         M * sizeof(vec3), (GLvoid*) (j * sizeof(vec3)));
-                glBindBuffer(GL_ARRAY_BUFFER, param_buf);
+                glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
                 glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                         M * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
                 glDrawArrays(GL_LINE_LOOP, 0, N);
@@ -184,9 +186,5 @@ void Spine::draw_mesh()
         }
         glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
         glDisableVertexAttribArray(flat_program->paramAttribute);
-    }
-    {
-        glDeleteBuffers(1, &point_buf);
-        glDeleteBuffers(1, &param_buf);
     }
 }

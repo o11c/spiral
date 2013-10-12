@@ -191,6 +191,8 @@ void keyboard(unsigned char key, int, int)
     default:
         return;
     }
+    the_spine->dirty_spine = true;
+    the_spine->dirty_mesh = true;
     glutPostRedisplay();
 }
 
