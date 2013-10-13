@@ -28,7 +28,7 @@ MKDIR_FIRST = @mkdir -p ${@D}
 all: ${PROGRAMS}
 
 clean:
-	rm -r obj/ bin/
+	rm -rf obj/ bin/
 obj/%.d: src/%.cpp
 	$(MKDIR_FIRST)
 	${CXX} ${CPPFLAGS} ${CXXFLAGS} -MG -MP -MM $< \

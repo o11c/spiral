@@ -1,0 +1,46 @@
+Author: Ben Longbons <brlongbons@gmail.com>
+ID: 11093114
+
+Usage:
+    Optionally, edit ./config.h for the best experience on your platform.
+
+    make
+    bin/spiral0 [args...]
+
+    The arguments are pass exactly as if typed after the program starts.
+    ./spiral1, ./spiral2, and ./spiral3 are wrapper scripts that give
+    the keys as required for the assignment.
+
+    All of the geometry parameters are dynamically controlled;
+    you may alter them by pressing keys. Lighting is hard-coded, however.
+
+    Lowercase makes it smaller, uppercase makes it bigger.
+
+    Click and drag to change the view angle, and scroll to zoom.
+
+    Also there are some special keys.
+
+Keys:
+    0: reset everything except the 1,2,3 toggles
+    1: toggle display of the spine curve.
+    2: toggle display of the mesh.
+    3: toggle display of the shaded thing.
+    8, 9: toggle display of each component of the mesh.
+
+    a, A: adjust torus major radius.
+    b, B: adjust torus minor radius.
+    r, R: adjust tube radious.
+
+    p, P: adjust number of circuits.
+    q, Q: adjust number of wraps.
+
+    n, N: adjust spine resolution. Note that this is modified by p and q.
+    m, M: adjust tube resolution.
+
+Bugs:
+    Something is wrong with the depth if you zoom in too much.
+    Certain small values of N cause kinks.
+
+    This code is somewhat stressful to compilers.
+    GCC 4.6 through 4.8 are known to work.
+    Current versions of clang give a bogus error on legal code.

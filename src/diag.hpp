@@ -4,7 +4,7 @@
 # ifdef __clang__
 // this might not work on Mac OS X, their toolchain is really screwed up
 #  define HAVE_GCC(major, minor, patch) (0)
-#  define REALLY_HAVE_CLANG(major, minor, patch)                    \
+#  define HAVE_CLANG(major, minor, patch)                           \
     (__clang_major__ > (major)                                      \
             or (__clang_major__ == (major)                          \
                 and (__clang_minor__ > (minor)                      \
