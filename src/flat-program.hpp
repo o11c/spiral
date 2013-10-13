@@ -4,14 +4,6 @@
 #include "flat-vertex-shader.hpp"
 #include "simple-fragment-shader.hpp"
 
-#include "matrix.hpp"
-
-namespace encv
-{
-    extern mat4 ModelView;
-    extern mat4 Projection;
-}
-
 class FlatProgram
 {
     unsigned int program;

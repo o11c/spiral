@@ -1,13 +1,14 @@
-#include "flat-program.hpp"
+#include "shade-program.hpp"
 
 #include <cstdio>
 
 #include "error.hpp"
 #include "gl_wrap.hpp"
-#include "state.hpp"
 #include "uniforms.hpp"
 
-FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
+#include "state.hpp"
+
+ShadeProgram::ShadeProgram(ShadeVertexShader *v, SimpleFragmentShader *f)
 : vs(v), fs(f)
 {
     program = glCreateProgram();
@@ -22,7 +23,7 @@ FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
     {
         GLchar buf[length];
         glGetProgramInfoLog(program, length, &length, buf);
-        printf("linking flat program:\n%s\n\n", buf);
+        printf("linking shaded program:\n%s\n\n", buf);
     }
 
     GLint success = 0;
@@ -36,24 +37,34 @@ FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
 #define UNIFORM(name, type)                                 \
     name##Uniform = glGetUniformLocation(program, #name);   \
     if (name##Uniform == -1) barf();
-#include "vertex-flat.glsl.def"
+#include "vertex-shaded.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
 
-FlatProgram::~FlatProgram()
+ShadeProgram::~ShadeProgram()
 {
     glDeleteProgram(program);
 }
 
-void FlatProgram::load()
+void ShadeProgram::load()
 {
     mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
+    auto& ModelViewValue = encv::ModelView;
+    mat3 NormalMatrixValue = encv::ModelView.get_normal();
+    auto& materialAmbientValue = encv::materialAmbient;
+    auto& materialDiffuseValue = encv::materialDiffuse;
+    auto& materialSpecularValue = encv::materialSpecular;
+    auto& materialShininessValue = encv::materialShininess;
+    auto& ambientLightValue = encv::ambientLight;
+    auto& lightPositionValue = encv::lightPosition;
+    auto& lightColorValue = encv::lightColor;
 
     glUseProgram(program);
 #define ATTRIBUTE(name, type)   /**/
 #define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
-#include "vertex-flat.glsl.def"
+#include "vertex-shaded.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
+

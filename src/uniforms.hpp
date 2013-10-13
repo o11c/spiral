@@ -2,6 +2,7 @@
 #define UNIFORMS_HPP
 
 #include "gl_wrap.hpp"
+#include "matrix.hpp"
 
 inline
 void load_uniform_float(GLint location, float& value)

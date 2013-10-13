@@ -4,6 +4,7 @@
 class SimpleFragmentShader
 {
     friend class FlatProgram;
+    friend class ShadeProgram;
     unsigned int shader;
 public:
     SimpleFragmentShader();

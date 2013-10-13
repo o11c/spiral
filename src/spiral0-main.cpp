@@ -9,6 +9,7 @@
 #include <limits>
 
 #include "spine.hpp"
+#include "state.hpp"
 
 const float UP_SCALE  = (16.f/15.f);
 const float DOWN_SCALE = (15.f/16.f);
@@ -69,9 +70,7 @@ void reset()
     the_spine->n = 10;
     the_spine->m = 10;
 
-    the_spine->spine = true;
-    the_spine->mesh_rings = true;
-    the_spine->mesh_longs = true;
+    the_spine->mesh_rings = the_spine->mesh_longs;
 }
 
 static
@@ -121,6 +120,20 @@ void mouse(int button, int state, int x, int y)
 static
 void display()
 {
+    const char *noyes[2] = {"no", "yes"};
+    printf("Drawing:\n");
+    printf("    spine: %s\n", noyes[the_spine->spine]);
+    printf("    mesh_rings: %s\n", noyes[the_spine->mesh_rings]);
+    printf("    mesh_longs: %s\n", noyes[the_spine->mesh_longs]);
+    printf("    shade: %s\n", noyes[the_spine->shade]);
+    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
+    printf("    (a, b, r) = (%f, %f, %f)\n", the_spine->a, the_spine->b, the_spine->r);
+    printf("    (p, q) = (%d, %d)\n", the_spine->p, the_spine->q);
+    printf("    (n, m) = (%d, %d)\n", the_spine->n, the_spine->m);
+    printf("    dirty spine: %s\n", noyes[the_spine->dirty_spine]);
+    printf("    dirty mesh: %s\n", noyes[the_spine->dirty_mesh]);
+    printf("\n");
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     encv::ModelView = mat4();
     encv::ModelView.lookat(
@@ -168,6 +181,9 @@ void keyboard(unsigned char key, int, int)
         toggle(the_spine->mesh_rings);
         toggle(the_spine->mesh_longs);
         break;
+    case '3':
+        toggle(the_spine->shade);
+        break;
     case '8':
         toggle(the_spine->mesh_rings);
         break;
@@ -203,7 +219,7 @@ void init_glut(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(500,500);
     glutInitWindowPosition(10,10);
-    glutCreateWindow("Shaded Glyph");
+    glutCreateWindow("Toroidal Spiral");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
@@ -213,7 +229,7 @@ void init_glut(int argc, char **argv)
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
             GLUT_ACTION_CONTINUE_EXECUTION);
 #else
-    printf("You suck - no mouse wheel or soft exit\n");
+    printf("You suck!\n");
 #endif
 }
 
@@ -221,20 +237,26 @@ void init_glut(int argc, char **argv)
 int main(int argc, char **argv)
 {
     init_glut(argc, argv);
-    FlatVertexShader vs;
+    FlatVertexShader fvs;
+    ShadeVertexShader svs;
     SimpleFragmentShader fs;
-    FlatProgram p(&vs, &fs);
-    Spine spine(&p);
+    FlatProgram fp(&fvs, &fs);
+    ShadeProgram sp(&svs, &fs);
+    Spine spine(&fp, &sp);
     root_object = &spine;
     the_spine = &spine;
 
     // the donut is reddish, so make the background the opposite
-    glClearColor(0.0, 0.05, 0.05, 1.0);
+    // this also makes the dark parts of the mesh visible
+    glClearColor(0.0, 0.1, 0.1, 1.0);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
     reset();
+    for (int i = 1; i < argc; ++i)
+        for (char *a = argv[i]; *a; ++a)
+            keyboard(*a, 0, 0);
     glutMainLoop();
 
     the_spine = nullptr;

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec bin/spiral0 3
