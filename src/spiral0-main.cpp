@@ -132,6 +132,7 @@ void display()
     printf("    (n, m) = (%d, %d)\n", the_spine->n, the_spine->m);
     printf("    dirty spine: %s\n", noyes[the_spine->dirty_spine]);
     printf("    dirty mesh: %s\n", noyes[the_spine->dirty_mesh]);
+    printf("    shininess: %d\n", encv::materialShininess);
     printf("\n");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -194,6 +195,8 @@ void keyboard(unsigned char key, int, int)
     case 'A': inc(the_spine->a, 1e3); break;
     case 'b': dec(1, the_spine->b); break;
     case 'B': inc(the_spine->b, 1e3); break;
+    case 'e': dec(1, encv::materialShininess); break;
+    case 'E': inc(encv::materialShininess, 50); break;
     case 'r': dec(1, the_spine->r); break;
     case 'R': inc(the_spine->r, 1e3); break;
     case 'p': dec(1, the_spine->p); break;
@@ -239,9 +242,10 @@ int main(int argc, char **argv)
     init_glut(argc, argv);
     FlatVertexShader fvs;
     ShadeVertexShader svs;
-    SimpleFragmentShader fs;
-    FlatProgram fp(&fvs, &fs);
-    ShadeProgram sp(&svs, &fs);
+    SimpleFragmentShader sfs;
+    BetterFragmentShader bfs;
+    FlatProgram fp(&fvs, &sfs);
+    ShadeProgram sp(&svs, &bfs);
     Spine spine(&fp, &sp);
     root_object = &spine;
     the_spine = &spine;

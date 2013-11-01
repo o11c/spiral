@@ -2,7 +2,7 @@
 #define SHADE_PROGRAM_HPP
 
 #include "shade-vertex-shader.hpp"
-#include "simple-fragment-shader.hpp"
+#include "better-fragment-shader.hpp"
 
 #include "matrix.hpp"
 
@@ -10,7 +10,7 @@ class ShadeProgram
 {
     unsigned int program;
     ShadeVertexShader *vs;
-    SimpleFragmentShader *fs;
+    BetterFragmentShader *fs;
 
 #define ATTRIBUTE(name, type)   public: int name##Attribute;
 #define UNIFORM(name, type)     private: int name##Uniform;
@@ -18,7 +18,7 @@ class ShadeProgram
 #undef ATTRIBUTE
 #undef UNIFORM
 public:
-    ShadeProgram(ShadeVertexShader *v, SimpleFragmentShader *f);
+    ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f);
     ~ShadeProgram();
 
     void load();

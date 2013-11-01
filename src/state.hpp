@@ -10,7 +10,7 @@ namespace encv
     extern vec3 materialAmbient;
     extern vec3 materialDiffuse;
     extern vec3 materialSpecular;
-    extern float materialShininess;
+    extern /*float*/int materialShininess;
     extern vec3 ambientLight;
     extern vec3 lightPosition;
     extern vec3 lightColor;

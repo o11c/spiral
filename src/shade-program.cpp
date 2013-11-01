@@ -8,7 +8,7 @@
 
 #include "state.hpp"
 
-ShadeProgram::ShadeProgram(ShadeVertexShader *v, SimpleFragmentShader *f)
+ShadeProgram::ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f)
 : vs(v), fs(f)
 {
     program = glCreateProgram();
@@ -55,7 +55,7 @@ void ShadeProgram::load()
     auto& materialAmbientValue = encv::materialAmbient;
     auto& materialDiffuseValue = encv::materialDiffuse;
     auto& materialSpecularValue = encv::materialSpecular;
-    auto& materialShininessValue = encv::materialShininess;
+    float materialShininessValue = /*int*/encv::materialShininess;
     auto& ambientLightValue = encv::ambientLight;
     auto& lightPositionValue = encv::lightPosition;
     auto& lightColorValue = encv::lightColor;
