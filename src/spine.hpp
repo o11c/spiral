@@ -12,7 +12,7 @@ class Spine : public Drawing
     FlatProgram *flat_program;
     ShadeProgram *shade_program;
 public:
-    float a, b, r;
+    float a, b, r, s;
     int p, q;
     int n, m;
     bool spine;

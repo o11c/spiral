@@ -144,8 +144,9 @@ void Spine::update_mesh()
         {
             float u = 2 * M_PI * j / M;
             params[i * (M + 1) + j] = {t, u};
-            norms[i * (M + 1) + j] = cos(u) * Bt + sin(u) * Nt;
-            points[i * (M + 1) + j] = Ct + r * norms[i * (M + 1) + j];
+            norms[i * (M + 1) + j] = s * cos(u) * Bt + r * sin(u) * Nt;
+            norm3(norms[i * (M + 1) + j]);
+            points[i * (M + 1) + j] = Ct + r * cos(u) * Bt + s * sin(u) * Nt;
             if (i == N)
                 continue;
             quad_indices[i * (M + 1) + j] = {

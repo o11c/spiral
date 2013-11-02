@@ -65,6 +65,7 @@ void reset()
     the_spine->a = 100;
     the_spine->b = 40;
     the_spine->r = 10;
+    the_spine->s = 10;
     the_spine->p = 2;
     the_spine->q = 5;
     the_spine->n = 10;
@@ -127,12 +128,12 @@ void display()
     printf("    mesh_longs: %s\n", noyes[the_spine->mesh_longs]);
     printf("    shade: %s\n", noyes[the_spine->shade]);
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
-    printf("    (a, b, r) = (%f, %f, %f)\n", the_spine->a, the_spine->b, the_spine->r);
+    printf("    (a, b, r, s) = (%f, %f, %f, %f)\n", the_spine->a, the_spine->b, the_spine->r, the_spine->s);
     printf("    (p, q) = (%d, %d)\n", the_spine->p, the_spine->q);
     printf("    (n, m) = (%d, %d)\n", the_spine->n, the_spine->m);
     printf("    dirty spine: %s\n", noyes[the_spine->dirty_spine]);
     printf("    dirty mesh: %s\n", noyes[the_spine->dirty_mesh]);
-    printf("    shininess: %d\n", encv::materialShininess);
+    printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -197,8 +198,10 @@ void keyboard(unsigned char key, int, int)
     case 'B': inc(the_spine->b, 1e3); break;
     case 'e': dec(1, encv::materialShininess); break;
     case 'E': inc(encv::materialShininess, 50); break;
-    case 'r': dec(1, the_spine->r); break;
-    case 'R': inc(the_spine->r, 1e3); break;
+    case 'r': dec(1, the_spine->r); // fallthrough
+    case 's': dec(1, the_spine->s); break;
+    case 'R': inc(the_spine->r, 1e3); // fallthrough
+    case 'S': inc(the_spine->s, 1e3); break;
     case 'p': dec(1, the_spine->p); break;
     case 'P': inc(the_spine->p, 100); break;
     case 'q': dec(1, the_spine->q); break;
