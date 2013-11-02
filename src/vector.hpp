@@ -1,8 +1,6 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include "property.hpp"
-
 struct ivec2
 {
     __attribute__((error("NYI")))
@@ -22,19 +20,29 @@ struct ivec4
 class vec2
 {
 public:
-    PROPERTY(vec2, float, x) { return data[0]; };
-    PROPERTY(vec2, float, y) { return data[1]; };
+    constexpr float x() const { return data[0]; }
+    constexpr float y() const { return data[1]; }
 
-    PROPERTY(vec2, float, r) { return data[0]; };
-    PROPERTY(vec2, float, g) { return data[1]; };
+    constexpr float r() const { return data[0]; }
+    constexpr float g() const { return data[1]; }
 
-    PROPERTY(vec2, float, A) { return data[0]; };
-    PROPERTY(vec2, float, B) { return data[1]; };
+    constexpr float s() const { return data[0]; }
+    constexpr float t() const { return data[1]; }
+
+    void x(float v) { data[0] = v; }
+    void y(float v) { data[1] = v; }
+
+    void r(float v) { data[0] = v; }
+    void g(float v) { data[1] = v; }
+
+    void s(float v) { data[0] = v; }
+    void t(float v) { data[1] = v; }
 private:
     float data[2];
 public:
-    vec2();
-    vec2(float, float);
+    vec2() = default;
+    constexpr
+    vec2(float x, float y) : data{x, y} {}
 
     float *ptr() { return data; }
     const float *ptr() const { return data; }
@@ -44,22 +52,35 @@ public:
 class vec3
 {
 public:
-    PROPERTY(vec3, float, x) { return data[0]; };
-    PROPERTY(vec3, float, y) { return data[1]; };
-    PROPERTY(vec3, float, z) { return data[2]; };
+    constexpr float x() const { return data[0]; }
+    constexpr float y() const { return data[1]; }
+    constexpr float z() const { return data[2]; }
 
-    PROPERTY(vec3, float, r) { return data[0]; };
-    PROPERTY(vec3, float, g) { return data[1]; };
-    PROPERTY(vec3, float, b) { return data[2]; };
+    constexpr float r() const { return data[0]; }
+    constexpr float g() const { return data[1]; }
+    constexpr float b() const { return data[2]; }
 
-    PROPERTY(vec3, float, A) { return data[0]; };
-    PROPERTY(vec3, float, B) { return data[1]; };
-    PROPERTY(vec3, float, C) { return data[2]; };
+    constexpr float s() const { return data[0]; }
+    constexpr float t() const { return data[1]; }
+    constexpr float p() const { return data[2]; }
+
+    void x(float v) { data[0] = v; }
+    void y(float v) { data[1] = v; }
+    void z(float v) { data[2] = v; }
+
+    void r(float v) { data[0] = v; }
+    void g(float v) { data[1] = v; }
+    void b(float v) { data[2] = v; }
+
+    void s(float v) { data[0] = v; }
+    void t(float v) { data[1] = v; }
+    void p(float v) { data[2] = v; }
 private:
     float data[3];
 public:
-    vec3();
-    vec3(float, float, float);
+    vec3() = default;
+    constexpr
+    vec3(float x, float y, float z) : data{x, y, z} {}
 
     float *ptr() { return data; }
     const float *ptr() const { return data; }
@@ -69,31 +90,43 @@ public:
 class vec4
 {
 public:
-    PROPERTY(vec4, float, x) { return data[0]; };
-    PROPERTY(vec4, float, y) { return data[1]; };
-    PROPERTY(vec4, float, z) { return data[2]; };
-    PROPERTY(vec4, float, w) { return data[3]; };
+    constexpr float x() const { return data[0]; }
+    constexpr float y() const { return data[1]; }
+    constexpr float z() const { return data[2]; }
+    constexpr float w() const { return data[3]; }
 
-    PROPERTY(vec4, float, r) { return data[0]; };
-    PROPERTY(vec4, float, g) { return data[1]; };
-    PROPERTY(vec4, float, b) { return data[2]; };
-    PROPERTY(vec4, float, a) { return data[3]; };
+    constexpr float r() const { return data[0]; }
+    constexpr float g() const { return data[1]; }
+    constexpr float b() const { return data[2]; }
+    constexpr float a() const { return data[3]; }
 
-    PROPERTY(vec4, float, s) { return data[0]; };
-    PROPERTY(vec4, float, t) { return data[1]; };
-    PROPERTY(vec4, float, p) { return data[2]; };
-    PROPERTY(vec4, float, q) { return data[3]; };
+    constexpr float s() const { return data[0]; }
+    constexpr float t() const { return data[1]; }
+    constexpr float p() const { return data[2]; }
+    constexpr float q() const { return data[3]; }
 
-    PROPERTY(vec4, float, A) { return data[0]; };
-    PROPERTY(vec4, float, B) { return data[1]; };
-    PROPERTY(vec4, float, C) { return data[2]; };
-    PROPERTY(vec4, float, D) { return data[3]; };
+    void x(float v) { data[0] = v; }
+    void y(float v) { data[1] = v; }
+    void z(float v) { data[2] = v; }
+    void w(float v) { data[3] = v; }
+
+    void r(float v) { data[0] = v; }
+    void g(float v) { data[1] = v; }
+    void b(float v) { data[2] = v; }
+    void a(float v) { data[3] = v; }
+
+    void s(float v) { data[0] = v; }
+    void t(float v) { data[1] = v; }
+    void p(float v) { data[2] = v; }
+    void q(float v) { data[3] = v; }
 private:
     float data[4];
 public:
-    vec4();
-    vec4(float, float, float, float);
-    vec4(const vec3& v, float w);
+    vec4() = default;
+    constexpr
+    vec4(float x, float y, float z, float w) : data{x, y, z, w} {}
+    constexpr
+    vec4(const vec3& v, float w) : data{v.x(), v.y(), v.z(), w} {}
 
     float *ptr() { return data; }
     const float *ptr() const { return data; }

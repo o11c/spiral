@@ -97,9 +97,9 @@ void mat4::lookat(const vec3& eye, const vec3& center, const vec3& up)
     U = cross(S, F);
     mat4 R;
     matrixSet4x4(R,
-                S.x,  S.y,  S.z, 0,
-                U.x,  U.y,  U.z, 0,
-               -F.x, -F.y, -F.z, 0,
+                S.x(),  S.y(),  S.z(), 0,
+                U.x(),  U.y(),  U.z(), 0,
+               -F.x(), -F.y(), -F.z(), 0,
                 0,    0,    0,   1);
     *this *= R;
     this->translate(-eye);
@@ -140,9 +140,9 @@ void mat4::scale(const vec3& s)
 {
     mat4 S;
     matrixSet4x4(S,
-                 s.x, 0,  0,  0,
-                 0,  s.y, 0,  0,
-                 0,  0,  s.z, 0,
+                 s.x(), 0,  0,  0,
+                 0,  s.y(), 0,  0,
+                 0,  0,  s.z(), 0,
                  0,  0,  0,  1);
     *this *= S;
 }
@@ -151,9 +151,9 @@ void mat4::translate(const vec3& d)
 {
     mat4 S;
     matrixSet4x4(S,
-                 1, 0, 0, d.x,
-                 0, 1, 0, d.y,
-                 0, 0, 1, d.z,
+                 1, 0, 0, d.x(),
+                 0, 1, 0, d.y(),
+                 0, 0, 1, d.z(),
                  0, 0, 0, 1);
     *this *= S;
 }
@@ -161,9 +161,9 @@ void mat4::translate(const vec3& d)
 void mat4::rotate(float angle_degrees, vec3 axis)
 {
     norm3(axis);
-    const float x = axis.x;
-    const float y = axis.y;
-    const float z = axis.z;
+    const float x = axis.x();
+    const float y = axis.y();
+    const float z = axis.z();
 
     const float angle = angle_degrees * (M_PI / 180);
     const float c = cosf(angle);
@@ -222,10 +222,10 @@ mat3 mat4::get_normal() const
 void mat4::reflect(const vec4& plane)
 {
     mat4 R;
-    const float A = plane.A;
-    const float B = plane.B;
-    const float C = plane.C;
-    const float D = plane.D;
+    const float A = plane.x();
+    const float B = plane.y();
+    const float C = plane.z();
+    const float D = plane.w();
     matrixSet4x4(R,
                  1 -2*A*A,  -2*A*B,  -2*A*C, -2*A*D,
                    -2*B*A, 1-2*B*B,  -2*B*C, -2*B*D,
@@ -236,29 +236,30 @@ void mat4::reflect(const vec4& plane)
 
 void mat4::shadow(const vec4& light, const vec4& plane)
 {
+    // plane's xyzw is really ABCD
     mat4 S;
 
     float dot = ::dot(light, plane);
 
-    S(0, 0) = dot - light.x * plane.A;
-    S(0, 1) =     - light.x * plane.B;
-    S(0, 2) =     - light.x * plane.C;
-    S(0, 3) =     - light.x * plane.D;
+    S(0, 0) = dot - light.x() * plane.x();
+    S(0, 1) =     - light.x() * plane.y();
+    S(0, 2) =     - light.x() * plane.z();
+    S(0, 3) =     - light.x() * plane.w();
 
-    S(1, 0) =     - light.y * plane.A;
-    S(1, 1) = dot - light.y * plane.B;
-    S(1, 2) =     - light.y * plane.C;
-    S(1, 3) =     - light.y * plane.D;
+    S(1, 0) =     - light.y() * plane.x();
+    S(1, 1) = dot - light.y() * plane.y();
+    S(1, 2) =     - light.y() * plane.z();
+    S(1, 3) =     - light.y() * plane.w();
 
-    S(2, 0) =     - light.z * plane.A;
-    S(2, 1) =     - light.z * plane.B;
-    S(2, 2) = dot - light.z * plane.C;
-    S(2, 3) =     - light.z * plane.D;
+    S(2, 0) =     - light.z() * plane.x();
+    S(2, 1) =     - light.z() * plane.y();
+    S(2, 2) = dot - light.z() * plane.z();
+    S(2, 3) =     - light.z() * plane.w();
 
-    S(3, 0) =     - light.w * plane.A;
-    S(3, 1) =     - light.w * plane.B;
-    S(3, 2) =     - light.w * plane.C;
-    S(3, 3) = dot - light.w * plane.D;
+    S(3, 0) =     - light.w() * plane.x();
+    S(3, 1) =     - light.w() * plane.y();
+    S(3, 2) =     - light.w() * plane.z();
+    S(3, 3) = dot - light.w() * plane.w();
 
     *this *= S;
 }
