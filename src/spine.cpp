@@ -121,16 +121,18 @@ void Spine::update_mesh()
         return;
     int N = n * p * q;
     int M = m;
+    while ((N + 1) * (M + 1) >= 65536)
+        N--;
     dirty_mesh = false;
-    vec3 points[N * M];
-    vec3 norms[N * M];
-    vec2 params[N * M];
+    vec3 points[(N + 1) * (M + 1)];
+    vec3 norms[(N + 1) * (M + 1)];
+    vec2 params[(N + 1) * (M + 1)];
     struct sv2
     {
         unsigned short a, b;
     };
     sv2 quad_indices[N * (M + 1)];
-    for (int i = 0; i < N; ++i)
+    for (int i = 0; i <= N; ++i)
     {
         float t = 2 * M_PI * i / N;
         vec3 Ct = C(t);
@@ -138,18 +140,19 @@ void Spine::update_mesh()
         norm3(Bt);
         vec3 Nt = this->N(t);
         norm3(Nt);
-        for (int j = 0; j < M; ++j)
+        for (int j = 0; j <= M; ++j)
         {
             float u = 2 * M_PI * j / M;
-            params[i * M + j] = {t, u};
-            norms[i * M + j] = cos(u) * Bt + sin(u) * Nt;
-            points[i * M + j] = Ct + r * norms[i * M + j];
+            params[i * (M + 1) + j] = {t, u};
+            norms[i * (M + 1) + j] = cos(u) * Bt + sin(u) * Nt;
+            points[i * (M + 1) + j] = Ct + r * norms[i * (M + 1) + j];
+            if (i == N)
+                continue;
             quad_indices[i * (M + 1) + j] = {
-                (unsigned short)(i * M + j),
-                (unsigned short)((i + 1) % N * M + j),
+                (unsigned short)(i * (M + 1) + j),
+                (unsigned short)((i + 1) * (M + 1) + j),
             };
         }
-        quad_indices[i * (M + 1) + M] = quad_indices[i * (M + 1) + 0];
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
@@ -177,18 +180,21 @@ void Spine::draw_mesh()
 
     int N = n * p * q;
     int M = m;
+    while ((N + 1) * (M + 1) >= 65536)
+        N--;
 
     glEnableVertexAttribArray(flat_program->vertexPositionAttribute);
     glEnableVertexAttribArray(flat_program->paramAttribute);
     if (mesh_rings)
     {
         // rings around the spine
-        // there are N of these, and each has M points
+        // there are N(+1) of these, and each has M(+1) points
         // and they are adjacent
         // with M=5, N=3
-        // 11111
-        //      22222
-        //           33333
+        // 11111X
+        //       22222X
+        //             33333X
+        //                   YYYYYX
         glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
         glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
@@ -197,28 +203,29 @@ void Spine::draw_mesh()
                 0, (GLvoid*) 0);
         for (int i = 0; i < N; ++i)
         {
-            glDrawArrays(GL_LINE_LOOP, i * M, M);
+            glDrawArrays(GL_LINE_LOOP, i * (M + 1), M);
         }
     }
     if (mesh_longs)
     {
         // the long bits "parallel" to the spine
-        // there are M of these, and each has N points
+        // there are M(+1) of these, and each has N(+1) points
         // but they are interleaved
         // with M=5, N=3
-        // 1    1    1
-        //  2    2    2
-        //   3    3    3
-        //    4    4    4
-        //     5    5    5
+        // 1     1     1     Y
+        //  2     2     2     Y
+        //   3     3     3     Y
+        //    4     4     4     Y
+        //     5     5     5     Y
+        //      X     X     X     X
         for (int j = 0; j < M; ++j)
         {
             glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
             glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
-                    M * sizeof(vec3), (GLvoid*) (j * sizeof(vec3)));
+                    (M + 1) * sizeof(vec3), (GLvoid*) (j * sizeof(vec3)));
             glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
             glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
-                    M * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
+                    (M + 1) * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
             glDrawArrays(GL_LINE_LOOP, 0, N);
         }
     }
@@ -233,6 +240,8 @@ void Spine::draw_shade()
 
     int N = n * p * q;
     int M = m;
+    while ((N + 1) * (M + 1) >= 65536)
+        N--;
 
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);

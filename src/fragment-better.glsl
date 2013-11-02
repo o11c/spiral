@@ -15,7 +15,6 @@ uniform vec3 lightColor;
 
 void main()
 {
-    // the interpolation of t and u is wrong at the seam
     float t = frag_param.x;
     float u = frag_param.y;
     float cu = (cos(u) + 1.0) / 2.0;
