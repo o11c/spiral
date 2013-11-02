@@ -29,7 +29,8 @@ Keys:
 
     a, A: adjust torus major radius.
     b, B: adjust torus minor radius.
-    r, R: adjust tube radious.
+    r, R: adjust tube radius.
+    s, S: adjust tube second radius.
 
     p, P: adjust number of circuits.
     q, Q: adjust number of wraps.
@@ -37,10 +38,11 @@ Keys:
     n, N: adjust spine resolution. Note that this is modified by p and q.
     m, M: adjust tube resolution.
 
+    e, E: adjust shininess exponent.
+
 Bugs:
     Something is wrong with the depth if you zoom in too much.
     Certain small values of N cause kinks.
 
-    This code is somewhat stressful to compilers.
-    GCC 4.6 through 4.8 are known to work.
-    Current versions of clang give a bogus error on legal code.
+    This code is somewhat stressful to compilers. To see if yours works,
+    check the buildbot results: https://travis-ci.org/o11c/spiral

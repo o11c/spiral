@@ -1,0 +1,92 @@
+## Doesn't appear to do anything useful.
+language: cpp
+
+## Notifications
+## The default is to send email on all failures and changed success
+## Adding other notifiers (like IRC) does not disable the email one
+notifications:
+  ## This is, in fact, the default email setting so it is unnecessary.
+  ## It would probably be too annoying to set on_success: always
+  email:
+    on_success: changed
+    on_failure: always
+
+## Commands before installing prerequisites
+before_install: export CC=${REAL_CC} CXX=${REAL_CXX}
+
+## Install prerequisites
+install:
+# if > or | folding is used, error
+# but YAML folds by default on this, so it works (I hope)
+  -
+    if [ -n "$PPA" ];
+    then
+        sudo add-apt-repository --yes $PPA;
+    fi
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq $PACKAGE
+  - sudo apt-get install -qq freeglut3-dev
+
+## Do something before the main test script
+before_script:
+  -
+    if [ $PACKAGE = clang-3.1 ];
+    then
+      wget http://clang.llvm.org/libstdc++4.6-clang11.patch;
+      sudo patch /usr/include/c++/4.6/type_traits < libstdc++4.6-clang11.patch;
+    fi
+
+## Main test script
+script:
+  - make -k -j2
+
+### The rest of the file creates a build matrix
+### containing gcc-4.6 through gcc-4.8 and clang-3.1 through clang-3.3
+
+## This doesn't work - travis defaults to plain gcc if unknown
+## http://github.com/travis-ci/travis-ci/issues/979
+#compiler:
+#  - gcc-4.6
+#  - gcc-4.7
+#  - gcc-4.8
+#  - clang-3.1
+#  - clang-3.2
+#  - clang-3.3
+env:
+  - ignore=this
+
+matrix:
+  allow_failures:
+    - compiler: clang
+      env: REAL_CC=clang-2.9 REAL_CXX=clang++-2.9 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-2.9
+    - compiler: clang
+      env: REAL_CC=clang-3.0 REAL_CXX=clang++-3.0 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.0
+    - compiler: clang
+      env: REAL_CC=clang-3.1 REAL_CXX=clang++-3.1 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.1
+    - compiler: gcc
+      env: REAL_CC=gcc-4.4   REAL_CXX=g++-4.4     PPA=                            PACKAGE=g++-4.4
+    - compiler: gcc
+      env: REAL_CC=gcc-4.5   REAL_CXX=g++-4.5     PPA=                            PACKAGE=g++-4.5
+  exclude:
+    - env: ignore=this
+  include:
+    - compiler: clang
+      env: REAL_CC=clang-2.9 REAL_CXX=clang++-2.9 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-2.9
+    - compiler: clang
+      env: REAL_CC=clang-3.0 REAL_CXX=clang++-3.0 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.0
+    - compiler: clang
+      env: REAL_CC=clang-3.1 REAL_CXX=clang++-3.1 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.1
+    - compiler: clang
+      env: REAL_CC=clang-3.2 REAL_CXX=clang++-3.2 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.2
+    - compiler: clang
+      env: REAL_CC=clang-3.3 REAL_CXX=clang++-3.3 PPA=ppa:h-rayflood/llvm         PACKAGE=clang-3.3
+    - compiler: gcc
+      env: REAL_CC=gcc-4.4   REAL_CXX=g++-4.4     PPA=                            PACKAGE=g++-4.4
+    - compiler: gcc
+      env: REAL_CC=gcc-4.5   REAL_CXX=g++-4.5     PPA=                            PACKAGE=g++-4.5
+    - compiler: gcc
+      env: REAL_CC=gcc-4.6   REAL_CXX=g++-4.6     PPA=                            PACKAGE=g++-4.6
+    - compiler: gcc
+      env: REAL_CC=gcc-4.7   REAL_CXX=g++-4.7     PPA=ppa:ubuntu-toolchain-r/test PACKAGE=g++-4.7
+    - compiler: gcc
+      env: REAL_CC=gcc-4.8   REAL_CXX=g++-4.8     PPA=ppa:ubuntu-toolchain-r/test PACKAGE=g++-4.8
