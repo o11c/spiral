@@ -59,17 +59,15 @@ int sx, sy;
 static
 void reset()
 {
-    rho = 500;
+    rho = 5;
     theta = 45 * M_PI/180;
     phi = 45 * M_PI/180;
-    the_super->a = 100;
-    the_super->b = 40;
-    the_super->r = 10;
-    the_super->s = 10;
-    the_super->p = 2;
-    the_super->q = 5;
-    the_super->n = 10;
-    the_super->m = 10;
+    the_super->tor = false;
+    the_super->d = 1.5f;
+    the_super->em = 2;
+    the_super->en = 2;
+    the_super->dn = 10;
+    the_super->dm = 10;
 
     the_super->mesh_rings = the_super->mesh_longs;
 }
@@ -127,9 +125,10 @@ void display()
     printf("    mesh_longs: %s\n", noyes[the_super->mesh_longs]);
     printf("    shade: %s\n", noyes[the_super->shade]);
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
-    printf("    (a, b, r, s) = (%f, %f, %f, %f)\n", the_super->a, the_super->b, the_super->r, the_super->s);
-    printf("    (p, q) = (%d, %d)\n", the_super->p, the_super->q);
-    printf("    (n, m) = (%d, %d)\n", the_super->n, the_super->m);
+    if (the_super->tor)
+        printf("    (d) = (%f)\n", the_super->d);
+    printf("    (n, m) = (%f, %f)\n", the_super->en, the_super->em);
+    printf("    (N, M) = (%d, %d)\n", the_super->dn, the_super->dm);
     printf("    dirty mesh: %s\n", noyes[the_super->dirty_mesh]);
     printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
@@ -187,24 +186,19 @@ void keyboard(unsigned char key, int, int)
     case '9':
         toggle(the_super->mesh_longs);
         break;
-    case 'a': dec(1, the_super->a); break;
-    case 'A': inc(the_super->a, 1e3); break;
-    case 'b': dec(1, the_super->b); break;
-    case 'B': inc(the_super->b, 1e3); break;
-    case 'e': dec(1, encv::materialShininess); break;
-    case 'E': inc(encv::materialShininess, 50); break;
-    case 'r': dec(1, the_super->r); // fallthrough
-    case 's': dec(1, the_super->s); break;
-    case 'R': inc(the_super->r, 1e3); // fallthrough
-    case 'S': inc(the_super->s, 1e3); break;
-    case 'p': dec(1, the_super->p); break;
-    case 'P': inc(the_super->p, 100); break;
-    case 'q': dec(1, the_super->q); break;
-    case 'Q': inc(the_super->q, 100); break;
-    case 'n': dec(3, the_super->n); break;
-    case 'N': inc(the_super->n, 100); break;
-    case 'm': dec(3, the_super->m); break;
-    case 'M': inc(the_super->m, 100); break;
+    case 't':
+        toggle(the_super->tor);
+        break;
+    case 'd': dec(0.1f, the_super->d); break;
+    case 'D': inc(the_super->d, 10.f); break;
+    case 'p': dec(1, the_super->en); break;
+    case 'P': inc(the_super->en, 100); break;
+    case 'q': dec(1, the_super->em); break;
+    case 'Q': inc(the_super->em, 100); break;
+    case 'n': dec(3, the_super->dn); break;
+    case 'N': inc(the_super->dn, 100); break;
+    case 'm': dec(3, the_super->dm); break;
+    case 'M': inc(the_super->dm, 100); break;
     default:
         return;
     }

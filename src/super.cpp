@@ -21,42 +21,37 @@ Super::~Super()
     glDeleteBuffers(4, &mesh_points);
 }
 
-vec3 Super::C(float t)
+static
+float safe_pow(float base, float expon)
 {
-    float x = (a + b * cos(q * t)) * cos(p * t);
-    float y = (a + b * cos(q * t)) * sin(p * t);
-    float z = b * sin(q * t);
+    if (base < 0.0f)
+        return -safe_pow(-base, expon);
+    return pow(base, expon);
+}
+
+vec3 Super::SE(float u, float v)
+{
+    float x = safe_pow(cos(v), 2/em) * safe_pow(cos(u), 2/en);
+    float y = safe_pow(cos(v), 2/em) * safe_pow(sin(u), 2/en);
+    float z = safe_pow(sin(v), 2/em);
     return {x, y, z};
 }
-vec3 Super::T(float t)
+
+vec3 Super::ST(float u, float v)
 {
-    // in CSE we trust
-    vec3 c = C(t);
-    float dx = -p * c.y() - b * q * sin(q * t) * cos(p * t);
-    float dy = p * c.x() - b * q * sin(q * t) * sin(p * t);
-    float dz = b * q * cos(q * t);
-    return {dx, dy, dz};
+    float x = (d + safe_pow(cos(v), 2/em)) * safe_pow(cos(u), 2/en);
+    float y = (d + safe_pow(cos(v), 2/em)) * safe_pow(sin(u), 2/en);
+    float z = safe_pow(sin(v), 2/em);
+    return {x, y, z};
 }
 
-vec3 Super::A(float t)
+vec3 Super::SN(float u, float v)
 {
-    vec3 d = T(t);
-    float ax = -p * d.y() + b * q * (p * sin(q * t) * sin(p * t) - q * cos(q * t) * cos(p * t));
-    float ay = p * d.x() - b * q * (p * sin(q * t) * cos(p * t) + q * cos(q * t) * sin(p * t));
-    float az = -b * q * q * sin(q * t);
-    return {ax, ay, az};
+    float x = safe_pow(cos(v), 2 - 2/em) * safe_pow(cos(u), 2 - 2/en);
+    float y = safe_pow(cos(v), 2 - 2/em) * safe_pow(sin(u), 2 - 2/en);
+    float z = safe_pow(sin(v), 2 - 2/em);
+    return {x, y, z};
 }
-
-vec3 Super::B(float t)
-{
-    return cross(T(t), A(t));
-}
-
-vec3 Super::N(float t)
-{
-    return cross(B(t), T(t));
-}
-
 
 void Super::draw()
 {
@@ -70,10 +65,8 @@ void Super::update_mesh()
 {
     if (!dirty_mesh)
         return;
-    int N = n * p * q;
-    int M = m;
-    while ((N + 1) * (M + 1) >= 65536)
-        N--;
+    int N = dn;
+    int M = dm;
     dirty_mesh = false;
     vec3 points[(N + 1) * (M + 1)];
     vec3 norms[(N + 1) * (M + 1)];
@@ -85,24 +78,24 @@ void Super::update_mesh()
     sv2 quad_indices[N * (M + 1)];
     for (int i = 0; i <= N; ++i)
     {
-        float t = 2 * M_PI * i / N;
-        vec3 Ct = C(t);
-        vec3 Bt = B(t);
-        norm3(Bt);
-        vec3 Nt = this->N(t);
-        norm3(Nt);
+        float v = (2.0f * i/N - 1.0f);
+        if (tor)
+            v *= M_PI;
+        else
+            v *= M_PI_2;
+
         for (int j = 0; j <= M; ++j)
         {
-            float u = 2 * M_PI * j / M;
-            params[i * (M + 1) + j] = {t, u};
-            norms[i * (M + 1) + j] = s * cos(u) * Bt + r * sin(u) * Nt;
+            float u = (2.0f * j/M - 1.0f) * M_PI;
+            points[i * (M + 1) + j] = tor ? ST(u, v) : SE(u, v);
+            params[i * (M + 1) + j] = {u, v};
+            norms[i * (M + 1) + j] = SN(u, v);
             norm3(norms[i * (M + 1) + j]);
-            points[i * (M + 1) + j] = Ct + r * cos(u) * Bt + s * sin(u) * Nt;
             if (i == N)
                 continue;
             quad_indices[i * (M + 1) + j] = {
-                (unsigned short)(i * (M + 1) + j),
                 (unsigned short)((i + 1) * (M + 1) + j),
+                (unsigned short)(i * (M + 1) + j),
             };
         }
     }
@@ -130,10 +123,8 @@ void Super::draw_mesh()
     update_mesh();
     flat_program->load();
 
-    int N = n * p * q;
-    int M = m;
-    while ((N + 1) * (M + 1) >= 65536)
-        N--;
+    int N = dn;
+    int M = dm;
 
     glEnableVertexAttribArray(flat_program->vertexPositionAttribute);
     glEnableVertexAttribArray(flat_program->paramAttribute);
@@ -155,7 +146,7 @@ void Super::draw_mesh()
                 0, (GLvoid*) 0);
         for (int i = 0; i < N; ++i)
         {
-            glDrawArrays(GL_LINE_LOOP, i * (M + 1), M);
+            glDrawArrays(GL_LINE_STRIP, i * (M + 1), M + 1);
         }
     }
     if (mesh_longs)
@@ -178,7 +169,7 @@ void Super::draw_mesh()
             glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
             glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                     (M + 1) * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
-            glDrawArrays(GL_LINE_LOOP, 0, N);
+            glDrawArrays(GL_LINE_STRIP, 0, N + 1);
         }
     }
     glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
@@ -190,10 +181,8 @@ void Super::draw_shade()
     update_mesh();
     shade_program->load();
 
-    int N = n * p * q;
-    int M = m;
-    while ((N + 1) * (M + 1) >= 65536)
-        N--;
+    int N = dn;
+    int M = dm;
 
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);

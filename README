@@ -46,3 +46,5 @@ Bugs:
 
     This code is somewhat stressful to compilers. To see if yours works,
     check the buildbot results: https://travis-ci.org/o11c/spiral
+
+    Currently, gcc 4.6+ and clang 3.2+ seem to work.

@@ -12,9 +12,10 @@ class Super : public Drawing
     FlatProgram *flat_program;
     ShadeProgram *shade_program;
 public:
-    float a, b, r, s;
-    int p, q;
-    int n, m;
+    float d; bool tor;
+    float em, en;
+    int dm, dn;
+
     bool mesh_rings, mesh_longs;
     bool shade;
 
@@ -25,11 +26,9 @@ public:
     Super(FlatProgram *fp, ShadeProgram *sp);
     ~Super();
 
-    vec3 C(float t);
-    vec3 T(float t);
-    vec3 A(float t);
-    vec3 B(float t);
-    vec3 N(float t);
+    vec3 SE(float u, float v);
+    vec3 ST(float u, float v);
+    vec3 SN(float u, float v);
 
     void draw() override;
 private:

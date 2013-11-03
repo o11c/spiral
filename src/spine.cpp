@@ -109,7 +109,7 @@ void Spine::draw_spine()
         glBindBuffer(GL_ARRAY_BUFFER, spine_params);
         glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
-        glDrawArrays(GL_LINE_LOOP, 0, N);
+        glDrawArrays(GL_LINE_STRIP, 0, N+1);
         glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
         glDisableVertexAttribArray(flat_program->paramAttribute);
     }
@@ -204,7 +204,7 @@ void Spine::draw_mesh()
                 0, (GLvoid*) 0);
         for (int i = 0; i < N; ++i)
         {
-            glDrawArrays(GL_LINE_LOOP, i * (M + 1), M);
+            glDrawArrays(GL_LINE_STRIP, i * (M + 1), M + 1);
         }
     }
     if (mesh_longs)
@@ -227,7 +227,7 @@ void Spine::draw_mesh()
             glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
             glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
                     (M + 1) * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
-            glDrawArrays(GL_LINE_LOOP, 0, N);
+            glDrawArrays(GL_LINE_STRIP, 0, N + 1);
         }
     }
     glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
