@@ -123,7 +123,6 @@ void display()
 {
     const char *noyes[2] = {"no", "yes"};
     printf("Drawing:\n");
-    printf("    spine: %s\n", noyes[the_super->spine]);
     printf("    mesh_rings: %s\n", noyes[the_super->mesh_rings]);
     printf("    mesh_longs: %s\n", noyes[the_super->mesh_longs]);
     printf("    shade: %s\n", noyes[the_super->shade]);
@@ -131,7 +130,6 @@ void display()
     printf("    (a, b, r, s) = (%f, %f, %f, %f)\n", the_super->a, the_super->b, the_super->r, the_super->s);
     printf("    (p, q) = (%d, %d)\n", the_super->p, the_super->q);
     printf("    (n, m) = (%d, %d)\n", the_super->n, the_super->m);
-    printf("    dirty spine: %s\n", noyes[the_super->dirty_spine]);
     printf("    dirty mesh: %s\n", noyes[the_super->dirty_mesh]);
     printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
@@ -176,9 +174,6 @@ void keyboard(unsigned char key, int, int)
     case '0':
         reset();
         break;
-    case '1':
-        toggle(the_super->spine);
-        break;
     case '2':
         toggle(the_super->mesh_rings);
         toggle(the_super->mesh_longs);
@@ -213,7 +208,6 @@ void keyboard(unsigned char key, int, int)
     default:
         return;
     }
-    the_super->dirty_spine = true;
     the_super->dirty_mesh = true;
     glutPostRedisplay();
 }

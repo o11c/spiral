@@ -8,19 +8,17 @@
 Super::Super(FlatProgram *fp, ShadeProgram *sp)
 : flat_program(fp)
 , shade_program(sp)
-, spine(false)
 , mesh_rings(false)
 , mesh_longs(false)
 , shade(false)
-, dirty_spine(true)
 , dirty_mesh(true)
 {
-    glGenBuffers(6, &spine_points);
+    glGenBuffers(4, &mesh_points);
 }
 
 Super::~Super()
 {
-    glDeleteBuffers(6, &spine_points);
+    glDeleteBuffers(4, &mesh_points);
 }
 
 vec3 Super::C(float t)
@@ -62,57 +60,10 @@ vec3 Super::N(float t)
 
 void Super::draw()
 {
-    if (spine)
-        draw_spine();
     if (mesh_rings or mesh_longs)
         draw_mesh();
     if (shade)
         draw_shade();
-}
-
-void Super::update_spine()
-{
-    if (!dirty_spine)
-        return;
-    int N = n * p * q;
-    dirty_spine = false;
-    vec3 points[N];
-    vec2 params[N];
-    for (int i = 0; i < N; ++i)
-    {
-        float t = 2 * M_PI * i / N;
-        params[i] = {t, 0};
-        points[i] = C(t);
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, spine_points);
-    glBufferData(GL_ARRAY_BUFFER,
-            sizeof(points), points,
-            GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, spine_params);
-    glBufferData(GL_ARRAY_BUFFER,
-            sizeof(params), params,
-            GL_STATIC_DRAW);
-}
-
-void Super::draw_spine()
-{
-    update_spine();
-    flat_program->load();
-
-    int N = n * p * q;
-    {
-        glEnableVertexAttribArray(flat_program->vertexPositionAttribute);
-        glEnableVertexAttribArray(flat_program->paramAttribute);
-        glBindBuffer(GL_ARRAY_BUFFER, spine_points);
-        glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
-                0, (GLvoid*) 0);
-        glBindBuffer(GL_ARRAY_BUFFER, spine_params);
-        glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
-                0, (GLvoid*) 0);
-        glDrawArrays(GL_LINE_LOOP, 0, N);
-        glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
-        glDisableVertexAttribArray(flat_program->paramAttribute);
-    }
 }
 
 void Super::update_mesh()

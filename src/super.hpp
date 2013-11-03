@@ -15,13 +15,11 @@ public:
     float a, b, r, s;
     int p, q;
     int n, m;
-    bool spine;
     bool mesh_rings, mesh_longs;
     bool shade;
 
-    bool dirty_spine, dirty_mesh;
+    bool dirty_mesh;
 private:
-    unsigned int spine_points, spine_params;
     unsigned int mesh_points, mesh_norms, mesh_params, mesh_indices;
 public:
     Super(FlatProgram *fp, ShadeProgram *sp);
@@ -35,10 +33,8 @@ public:
 
     void draw() override;
 private:
-    void update_spine();
     void update_mesh();
 
-    void draw_spine();
     void draw_mesh();
     void draw_shade();
 };
