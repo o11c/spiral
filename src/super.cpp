@@ -70,7 +70,7 @@ void Super::update_mesh()
     dirty_mesh = false;
     vec3 points[(N + 1) * (M + 1)];
     vec3 norms[(N + 1) * (M + 1)];
-    vec2 params[(N + 1) * (M + 1)];
+    vec4 params[(N + 1) * (M + 1)];
     struct sv2
     {
         unsigned short a, b;
@@ -88,7 +88,7 @@ void Super::update_mesh()
         {
             float u = (2.0f * j/M - 1.0f) * M_PI;
             points[i * (M + 1) + j] = tor ? ST(u, v) : SE(u, v);
-            params[i * (M + 1) + j] = {u, v};
+            params[i * (M + 1) + j] = {float(j) / M, float(i) / N, 0, 1};
             norms[i * (M + 1) + j] = SN(u, v);
             norm3(norms[i * (M + 1) + j]);
             if (i == N)
@@ -142,7 +142,7 @@ void Super::draw_mesh()
         glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-        glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         for (int i = 0; i < N; ++i)
         {
@@ -167,8 +167,8 @@ void Super::draw_mesh()
             glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                     (M + 1) * sizeof(vec3), (GLvoid*) (j * sizeof(vec3)));
             glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-            glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
-                    (M + 1) * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
+            glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
+                    (M + 1) * sizeof(vec4), (GLvoid*) (j * sizeof(vec4)));
             glDrawArrays(GL_LINE_STRIP, 0, N + 1);
         }
     }
@@ -197,7 +197,7 @@ void Super::draw_shade()
         glVertexAttribPointer(shade_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-        glVertexAttribPointer(shade_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(shade_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_indices);
         //for (int i = 0; i < N; ++i)

@@ -1,4 +1,4 @@
-varying vec2 frag_param;
+varying vec4 frag_param;
 varying vec3 frag_normal;
 varying vec4 frag_P;
 
@@ -15,8 +15,8 @@ uniform vec3 lightColor;
 
 void main()
 {
-    float t = frag_param.x;
-    float u = frag_param.y;
+    float t = frag_param.x * radians(360);
+    float u = frag_param.y * radians(360);
     float cu = (cos(u) + 1.0) / 2.0;
     float st = (sin(t) + 1.0) / 2.0;
     float ct = (cos(t) + 1.0) / 2.0;

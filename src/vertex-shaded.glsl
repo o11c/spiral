@@ -1,6 +1,6 @@
 attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
-attribute vec2 param;
+attribute vec4 param;
 
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
@@ -13,7 +13,7 @@ uniform vec3 ambientLight;
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
 
-varying vec2 frag_param;
+varying vec4 frag_param;
 varying vec3 frag_normal;
 varying vec4 frag_P;
 

@@ -8,8 +8,8 @@ varying vec4 frag_color;
 void main()
 {
     gl_Position = ModelViewProjection * vec4(vertexPosition, 1.0);
-    float t = param.x;
-    float u = param.y;
+    float t = param.x * radians(360);
+    float u = param.y * radians(360);
     float cu = (cos(u) + 1.0) / 2.0;
     float st = (sin(t) + 1.0) / 2.0;
     float ct = (cos(t) + 1.0) / 2.0;

@@ -95,7 +95,7 @@ void mouse(int button, int state, int x, int y)
     // they are always delivered as button events
     if (button == 3)
     {
-        dec(1e1, rho);
+        dec(1e0, rho);
         glutPostRedisplay();
         return;
     }
@@ -189,6 +189,8 @@ void keyboard(unsigned char key, int, int)
     case 't':
         toggle(the_super->tor);
         break;
+    case 'e': dec(1, encv::materialShininess); break;
+    case 'E': inc(encv::materialShininess, 50); break;
     case 'd': dec(0.1f, the_super->d); break;
     case 'D': inc(the_super->d, 10.f); break;
     case 'p': dec(1, the_super->en); break;
@@ -213,7 +215,7 @@ void init_glut(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(500,500);
     glutInitWindowPosition(10,10);
-    glutCreateWindow("Toroidal Spiral");
+    glutCreateWindow("Superquadric");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);

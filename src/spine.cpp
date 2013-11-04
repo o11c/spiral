@@ -77,11 +77,11 @@ void Spine::update_spine()
     int N = n * p * q;
     dirty_spine = false;
     vec3 points[N];
-    vec2 params[N];
+    vec4 params[N];
     for (int i = 0; i < N; ++i)
     {
         float t = 2 * M_PI * i / N;
-        params[i] = {t, 0};
+        params[i] = {float(i) / N, 0, 0, 1};
         points[i] = C(t);
     }
     glBindBuffer(GL_ARRAY_BUFFER, spine_points);
@@ -107,7 +107,7 @@ void Spine::draw_spine()
         glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, spine_params);
-        glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glDrawArrays(GL_LINE_STRIP, 0, N+1);
         glDisableVertexAttribArray(flat_program->vertexPositionAttribute);
@@ -126,7 +126,7 @@ void Spine::update_mesh()
     dirty_mesh = false;
     vec3 points[(N + 1) * (M + 1)];
     vec3 norms[(N + 1) * (M + 1)];
-    vec2 params[(N + 1) * (M + 1)];
+    vec4 params[(N + 1) * (M + 1)];
     struct sv2
     {
         unsigned short a, b;
@@ -143,7 +143,7 @@ void Spine::update_mesh()
         for (int j = 0; j <= M; ++j)
         {
             float u = 2 * M_PI * j / M;
-            params[i * (M + 1) + j] = {t, u};
+            params[i * (M + 1) + j] = {float(i) / N, float(j) / M, 0, 1};
             norms[i * (M + 1) + j] = s * cos(u) * Bt + r * sin(u) * Nt;
             norm3(norms[i * (M + 1) + j]);
             points[i * (M + 1) + j] = Ct + r * cos(u) * Bt + s * sin(u) * Nt;
@@ -200,7 +200,7 @@ void Spine::draw_mesh()
         glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-        glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         for (int i = 0; i < N; ++i)
         {
@@ -225,8 +225,8 @@ void Spine::draw_mesh()
             glVertexAttribPointer(flat_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
                     (M + 1) * sizeof(vec3), (GLvoid*) (j * sizeof(vec3)));
             glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-            glVertexAttribPointer(flat_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
-                    (M + 1) * sizeof(vec2), (GLvoid*) (j * sizeof(vec2)));
+            glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
+                    (M + 1) * sizeof(vec4), (GLvoid*) (j * sizeof(vec4)));
             glDrawArrays(GL_LINE_STRIP, 0, N + 1);
         }
     }
@@ -257,7 +257,7 @@ void Spine::draw_shade()
         glVertexAttribPointer(shade_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-        glVertexAttribPointer(shade_program->paramAttribute, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(shade_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_indices);
         //for (int i = 0; i < N; ++i)
