@@ -44,7 +44,7 @@ float dot(const vec4& l, const vec4& r)
 
 void norm3(vec3& V)
 {
-    const float s = 1.0f / sqrtf(dot(V, V));
+    const float s = 1.0f / mag(V);
     V *= s;
 }
 
@@ -55,4 +55,9 @@ vec3 cross(const vec3& U, const vec3& V)
         U.z() * V.x() - U.x() * V.z(),
         U.x() * V.y() - U.y() * V.x(),
     };
+}
+
+float mag(const vec3& v)
+{
+    return sqrtf(dot(v, v));
 }

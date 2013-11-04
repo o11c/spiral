@@ -12,7 +12,7 @@ class Super : public Drawing
     FlatProgram *flat_program;
     ShadeProgram *shade_program;
 public:
-    float d; bool tor;
+    float d; bool tor; bool a;
     float em, en;
     int dm, dn;
 

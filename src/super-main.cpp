@@ -63,11 +63,12 @@ void reset()
     theta = 45 * M_PI/180;
     phi = 45 * M_PI/180;
     the_super->tor = false;
+    the_super->a = true;
     the_super->d = 1.5f;
-    the_super->em = 2;
-    the_super->en = 2;
-    the_super->dn = 10;
-    the_super->dm = 10;
+    the_super->em = 4;
+    the_super->en = 4;
+    the_super->dn = 32;
+    the_super->dm = 32;
 
     the_super->mesh_rings = the_super->mesh_longs;
 }
@@ -188,6 +189,9 @@ void keyboard(unsigned char key, int, int)
         break;
     case 't':
         toggle(the_super->tor);
+        break;
+    case 'a':
+        toggle(the_super->a);
         break;
     case 'e': dec(1, encv::materialShininess); break;
     case 'E': inc(encv::materialShininess, 50); break;

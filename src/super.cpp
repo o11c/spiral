@@ -1,6 +1,7 @@
 #include "super.hpp"
 
 #include <cmath>
+#include <cstdio>
 
 #include "gl_wrap.hpp"
 #include "vector.hpp"
@@ -68,6 +69,7 @@ void Super::update_mesh()
     int N = dn;
     int M = dm;
     dirty_mesh = false;
+#define INDEX(i, j) ((i) * (M + 1) + (j))
     vec3 points[(N + 1) * (M + 1)];
     vec3 norms[(N + 1) * (M + 1)];
     vec4 params[(N + 1) * (M + 1)];
@@ -75,35 +77,112 @@ void Super::update_mesh()
     {
         unsigned short a, b;
     };
-    sv2 quad_indices[N * (M + 1)];
+    sv2 quad_indices[N * ((M + 1) + 2) - 2];
     for (int i = 0; i <= N; ++i)
     {
-        float v = (2.0f * i/N - 1.0f);
+        float t = float(i) / N;
+        float v = (2.0f * t - 1.0f);
         if (tor)
             v *= M_PI;
         else
             v *= M_PI_2;
 
+        if (i != 0 && i != N)
+        {
+            quad_indices[(i * (M + 3) - 1)] = {
+                (unsigned short)(INDEX(i + 1, 0)),
+                (unsigned short)(INDEX(i + 1, 0)),
+            };
+        }
         for (int j = 0; j <= M; ++j)
         {
-            // q is the distance between two points
-            // this is directly proportional to the radius, so don't bother calculating properly (yet).
-            // this is necessary to make textures appear properly when
-            // the faces are not squares; it is especially noticable at the poles.
-            float q;
-            float u = (2.0f * j/M - 1.0f) * M_PI;
-            vec3 p =
-            points[i * (M + 1) + j] = tor ? ST(u, v) : SE(u, v);
-            q = hypotf(p.x(), p.y());
-            params[i * (M + 1) + j] = {float(j) / M * q, float(i) / N * q, 0, 1 * q};
-            norms[i * (M + 1) + j] = SN(u, v);
-            norm3(norms[i * (M + 1) + j]);
+            float s = float(j) / M;
+            float u = (2.0f * s - 1.0f);
+            u *= M_PI;
+            points[INDEX(i, j)] = tor ? ST(u, v) : SE(u, v);
+            norms[INDEX(i, j)] = SN(u, v);
+            norm3(norms[INDEX(i, j)]);
             if (i == N)
                 continue;
-            quad_indices[i * (M + 1) + j] = {
-                (unsigned short)((i + 1) * (M + 1) + j),
-                (unsigned short)(i * (M + 1) + j),
+            quad_indices[(i * (M + 3) + j)] = {
+                (unsigned short)(INDEX(i + 1, j)),
+                (unsigned short)(INDEX(i, j)),
             };
+        }
+        if (i != N)
+            quad_indices[(i * (M + 3) + (M + 1))] = {
+                (unsigned short)(INDEX(i, M)),
+                (unsigned short)(INDEX(i, M)),
+            };
+    }
+    for (int i = 0; i <= N; ++i)
+    {
+        int si = i;
+        if (i == 0)
+            si = 1;
+        if (i == N)
+            si = N - 1;
+        for (int j = 0; j <= M; ++j)
+        {
+            int tj = j;
+            if (j == M)
+                tj = 0;
+            // giving up on this for now
+            float s = float(j) / M;
+            float t = float(i) / N;
+            printf("(%f, %f) -> ", s, t);
+
+            s = 0.0f;
+            {
+                float sn = 0.0f;
+                float d = 0.0f;
+                for (int k = 0; k < j; ++k)
+                {
+                    d = mag(points[INDEX(si, k + 1)] - points[INDEX(si, k)]);
+                    sn += d;
+                }
+                float sd = sn;
+                for (int k = j; k < M; ++k)
+                {
+                    float d = mag(points[INDEX(si, k + 1)] - points[INDEX(si, k)]);
+                    sd += d;
+                }
+                printf("{+%f = %f/%f,", d, sn, sd);
+                s = sn / sd;
+            }
+
+            t = 0.0f;
+            {
+                float tn = 0.0f;
+                float d = 0.0f;
+                for (int k = 0; k < i; ++k)
+                {
+                    d = mag(points[INDEX(k, tj)] - points[INDEX(k + 1, tj)]);
+                    tn += d;
+                }
+                float td = tn;
+                for (int k = i; k < N; ++k)
+                {
+                    float d = mag(points[INDEX(k, tj)] - points[INDEX(k + 1, tj)]);
+                    td += d;
+                }
+                printf("+%f = %f/%f} = ", d, tn, td);
+                t = tn / td;
+            }
+
+            printf("(%f, %f)", s, t);
+
+            // q is necessary to make textures appear properly when the
+            // faces are not squares; especially noticable at the poles.
+            float q = 0.0;
+            q += mag(points[INDEX(i, j)] - points[INDEX(i, (j + 1) % M)]);
+            q += mag(points[INDEX(i, j)] - points[INDEX(i, (j - 1 + M) % M)]);
+            printf("; %f\n", q);
+            // but this seems to cause other issues
+            if (a)
+                q = 1;
+
+            params[INDEX(i, j)] = {s * q, t * q, 0, 1 * q};
         }
     }
 
@@ -151,9 +230,9 @@ void Super::draw_mesh()
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
         glVertexAttribPointer(flat_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
-        for (int i = 0; i < N; ++i)
+        for (int i = 1; i < N; ++i)
         {
-            glDrawArrays(GL_LINE_STRIP, i * (M + 1), M + 1);
+            glDrawArrays(GL_LINE_STRIP, INDEX(i, 0), M + 1);
         }
     }
     if (mesh_longs)
@@ -209,7 +288,7 @@ void Super::draw_shade()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_indices);
         //for (int i = 0; i < N; ++i)
         {
-            glDrawElements(GL_TRIANGLE_STRIP, 2 * (M + 1) * N, GL_UNSIGNED_SHORT,
+            glDrawElements(GL_TRIANGLE_STRIP, N * (2 * (M + 1) + 4) - 4, GL_UNSIGNED_SHORT,
                     (GLvoid *) 0);
         }
     }

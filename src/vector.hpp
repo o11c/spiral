@@ -144,5 +144,6 @@ float dot(const vec3& l, const vec3& r);
 float dot(const vec4& l, const vec4& r);
 void norm3(vec3& V);
 vec3 cross(const vec3& U, const vec3& V);
+float mag(const vec3& v);
 
 #endif // VECTOR_HPP
