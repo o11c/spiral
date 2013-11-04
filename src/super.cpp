@@ -86,9 +86,16 @@ void Super::update_mesh()
 
         for (int j = 0; j <= M; ++j)
         {
+            // q is the distance between two points
+            // this is directly proportional to the radius, so don't bother calculating properly (yet).
+            // this is necessary to make textures appear properly when
+            // the faces are not squares; it is especially noticable at the poles.
+            float q;
             float u = (2.0f * j/M - 1.0f) * M_PI;
+            vec3 p =
             points[i * (M + 1) + j] = tor ? ST(u, v) : SE(u, v);
-            params[i * (M + 1) + j] = {float(j) / M, float(i) / N, 0, 1};
+            q = hypotf(p.x(), p.y());
+            params[i * (M + 1) + j] = {float(j) / M * q, float(i) / N * q, 0, 1 * q};
             norms[i * (M + 1) + j] = SN(u, v);
             norm3(norms[i * (M + 1) + j]);
             if (i == N)
