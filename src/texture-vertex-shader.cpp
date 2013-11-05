@@ -21,7 +21,7 @@ TextureVertexShader::TextureVertexShader()
     {
         GLchar buf[length];
         glGetShaderInfoLog(shader, length, &length, buf);
-        printf("compiling shaded vertex shader:\n%s\n\n", buf);
+        printf("compiling texture vertex shader:\n%s\n\n", buf);
     }
 
     GLint success = 0;

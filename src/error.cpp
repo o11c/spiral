@@ -53,6 +53,6 @@ void checkOpenGLError()
 void barf()
 {
     checkOpenGLError();
-    printf("no GL error, but exiting anyway");
+    printf("no GL error, but exiting anyway\n");
     exit(0);
 }

@@ -5,53 +5,27 @@ varying vec4 frag_P;
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform mat3 NormalMatrix;
-uniform vec3 materialAmbient;
-uniform vec3 materialDiffuse;
-uniform vec3 materialSpecular;
+uniform sampler2D ambient_texture;
+uniform sampler2D diffuse_texture;
+uniform sampler2D specular_texture;
 uniform float materialShininess;
 uniform vec3 ambientLight;
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
 
-vec3 phony_color(vec2 st)
-{
-    float s = st.s;
-    float t = st.t;
-
-    bool line = false;
-    if (mod(s * 18.0, 1.0) < 0.1)
-        line = true;
-    if (mod(t * 18.0, 1.0) < 0.1)
-        line = true;
-
-    if (false)
-    {
-        float s_ = s * radians(360);
-        float t_ = t * radians(360);
-        float ct = (cos(t_) + 1.0) / 2.0;
-        float ss = (sin(s_) + 1.0) / 2.0;
-        float cs = (cos(s_) + 1.0) / 2.0;
-        return vec3(ct, ss, cs);
-    }
-    else
-    {
-        return vec3(float(line), s, t);
-    }
-}
-
 vec3 color_ambient(vec4 coord)
 {
-    return materialAmbient * phony_color(coord.st / coord.q);
+    return texture2DProj(ambient_texture, coord).rgb;
 }
 
 vec3 color_diffuse(vec4 coord)
 {
-    return materialDiffuse * phony_color(coord.st / coord.q);
+    return texture2DProj(diffuse_texture, coord).rgb;
 }
 
 vec3 color_specular(vec4 coord)
 {
-    return materialSpecular;
+    return texture2DProj(specular_texture, coord).rgb;
 }
 
 void main()

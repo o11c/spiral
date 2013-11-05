@@ -3,6 +3,7 @@
 
 #include "gl_wrap.hpp"
 #include "matrix.hpp"
+#include "texture.hpp"
 
 inline
 void load_uniform_float(GLint location, float& value)
@@ -60,6 +61,14 @@ inline
 void load_uniform_mat4(GLint location, mat4& value)
 {
     glUniformMatrix4fv(location, 1, GL_FALSE, value.ptr());
+}
+
+inline
+void load_uniform_sampler2D(GLint location, sampler2D& value)
+{
+    glActiveTexture(GL_TEXTURE0 + value.which);
+    glBindTexture(GL_TEXTURE_2D, value.object);
+    glUniform1i(location, value.which);
 }
 
 #endif //UNIFORMS_HPP

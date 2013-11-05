@@ -1,7 +1,6 @@
 #include "super.hpp"
 
 #include <cmath>
-#include <cstdio>
 
 #include "gl_wrap.hpp"
 #include "vector.hpp"
@@ -132,7 +131,6 @@ void Super::update_mesh()
             // giving up on this for now
             float s = float(j) / M;
             float t = float(i) / N;
-            printf("(%f, %f) -> ", s, t);
 
             s = 0.0f;
             {
@@ -149,7 +147,6 @@ void Super::update_mesh()
                     float d = mag(points[INDEX(si, k + 1)] - points[INDEX(si, k)]);
                     sd += d;
                 }
-                printf("{+%f = %f/%f,", d, sn, sd);
                 s = sn / sd;
             }
 
@@ -168,18 +165,14 @@ void Super::update_mesh()
                     float d = mag(points[INDEX(k, tj)] - points[INDEX(k + 1, tj)]);
                     td += d;
                 }
-                printf("+%f = %f/%f} = ", d, tn, td);
                 t = tn / td;
             }
-
-            printf("(%f, %f)", s, t);
 
             // q is necessary to make textures appear properly when the
             // faces are not squares; especially noticable at the poles.
             float q = 0.0;
             q += mag(points[INDEX(i, j)] - points[INDEX(i, (j + 1) % M)]);
             q += mag(points[INDEX(i, j)] - points[INDEX(i, (j - 1 + M) % M)]);
-            printf("; %f\n", q);
             // but this seems to cause other issues
             if (a)
                 q = 1;

@@ -1,7 +1,9 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include "matrix.hpp"
+class mat4;
+class vec3;
+class sampler2D;
 
 namespace encv
 {
@@ -14,6 +16,10 @@ namespace encv
     extern vec3 ambientLight;
     extern vec3 lightPosition;
     extern vec3 lightColor;
+
+    extern sampler2D *ambient_texture;
+    extern sampler2D *diffuse_texture;
+    extern sampler2D *specular_texture;
 }
 
 #endif //STATE_HPP

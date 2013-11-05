@@ -8,8 +8,10 @@
 
 #include <limits>
 
+#include "error.hpp"
 #include "super.hpp"
 #include "state.hpp"
+#include "texture.hpp"
 
 const float UP_SCALE  = (16.f/15.f);
 const float DOWN_SCALE = (15.f/16.f);
@@ -120,6 +122,7 @@ void mouse(int button, int state, int x, int y)
 static
 void display()
 {
+    checkOpenGLError();
     const char *noyes[2] = {"no", "yes"};
     printf("Drawing:\n");
     printf("    mesh_rings: %s\n", noyes[the_super->mesh_rings]);
@@ -146,6 +149,7 @@ void display()
     if (root_object)
         root_object->draw();
     glutSwapBuffers();
+    checkOpenGLError();
 }
 
 static
@@ -253,6 +257,20 @@ int main(int argc, char **argv)
     root_object = &super;
     the_super = &super;
 
+    color red(255, 0, 0, 255);
+    color green(0, 255, 0, 255);
+    color blue(0, 0, 255, 255);
+
+    checkOpenGLError();
+    sampler2D earth_lights(0, &red, 1, 1);
+    sampler2D earth_map(1, &green, 1, 1);
+    sampler2D earth_specular(2, &blue, 1, 1);
+    checkOpenGLError();
+
+    encv::ambient_texture = &earth_lights;
+    encv::diffuse_texture = &earth_map;
+    encv::specular_texture = &earth_specular;
+
     // the donut is reddish, so make the background the opposite
     // this also makes the dark parts of the mesh visible
     glClearColor(0.0, 0.1, 0.1, 1.0);
@@ -260,10 +278,14 @@ int main(int argc, char **argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    checkOpenGLError();
     reset();
     for (int i = 1; i < argc; ++i)
         for (char *a = argv[i]; *a; ++a)
             keyboard(*a, 0, 0);
+
+    checkOpenGLError();
+
     glutMainLoop();
 
     the_super = nullptr;

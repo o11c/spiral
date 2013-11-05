@@ -1,5 +1,8 @@
 #include "state.hpp"
 
+#include "matrix.hpp"
+#include "texture.hpp"
+
 namespace encv
 {
     mat4 ModelView;
@@ -11,4 +14,8 @@ namespace encv
     vec3 ambientLight = {0.5, 0.5, 0.5};
     vec3 lightPosition = {1000, 1000, 1000};
     vec3 lightColor = {1.0, 1.0, 1.0};
+
+    sampler2D *ambient_texture = nullptr;
+    sampler2D *diffuse_texture = nullptr;
+    sampler2D *specular_texture = nullptr;
 }

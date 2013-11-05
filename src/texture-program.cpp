@@ -52,9 +52,9 @@ void TextureProgram::load()
     mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
     auto& ModelViewValue = encv::ModelView;
     mat3 NormalMatrixValue = encv::ModelView.get_normal();
-    auto& materialAmbientValue = encv::materialAmbient;
-    auto& materialDiffuseValue = encv::materialDiffuse;
-    auto& materialSpecularValue = encv::materialSpecular;
+    auto& ambient_textureValue = *encv::ambient_texture;
+    auto& diffuse_textureValue = *encv::diffuse_texture;
+    auto& specular_textureValue = *encv::specular_texture;
     float materialShininessValue = /*int*/encv::materialShininess;
     auto& ambientLightValue = encv::ambientLight;
     auto& lightPositionValue = encv::lightPosition;

@@ -21,7 +21,7 @@ BetterFragmentShader::BetterFragmentShader()
     {
         GLchar buf[length];
         glGetShaderInfoLog(shader, length, &length, buf);
-        printf("compiling simple fragment shader:\n%s\n\n", buf);
+        printf("compiling better fragment shader:\n%s\n\n", buf);
     }
 
     GLint success = 0;
