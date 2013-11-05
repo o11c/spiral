@@ -10,7 +10,7 @@ TextureVertexShader::TextureVertexShader()
     shader = glCreateShader(GL_VERTEX_SHADER);
 
     const char *source =
-#include "vertex-shaded.glsl.h"
+#include "vertex-texture.glsl.h"
     ;
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);

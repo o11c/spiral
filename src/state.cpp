@@ -7,6 +7,7 @@ namespace encv
 {
     mat4 ModelView;
     mat4 Projection;
+    mat4 TextureMatrix;
     vec3 materialAmbient = {0.2, 0.2, 0.2};
     vec3 materialDiffuse = {0.3, 0.3, 0.3};
     vec3 materialSpecular = {0.8, 0.8, 0.8};

@@ -5,6 +5,7 @@ attribute vec4 param;
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform mat3 NormalMatrix;
+uniform mat4 TextureMatrix;
 uniform sampler2D ambient_texture;
 uniform sampler2D diffuse_texture;
 uniform sampler2D specular_texture;
@@ -21,6 +22,6 @@ void main()
 {
     gl_Position = ModelViewProjection * vec4(vertexPosition, 1.0);
     frag_normal = NormalMatrix * vertexNormal;
-    frag_param = param;
+    frag_param = TextureMatrix * param;
     frag_P = ModelView * vec4(vertexPosition, 1.0);
 }

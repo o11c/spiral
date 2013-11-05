@@ -52,6 +52,7 @@ void TextureProgram::load()
     mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
     auto& ModelViewValue = encv::ModelView;
     mat3 NormalMatrixValue = encv::ModelView.get_normal();
+    auto& TextureMatrixValue = encv::TextureMatrix;
     auto& ambient_textureValue = *encv::ambient_texture;
     auto& diffuse_textureValue = *encv::diffuse_texture;
     auto& specular_textureValue = *encv::specular_texture;

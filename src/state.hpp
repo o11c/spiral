@@ -9,6 +9,7 @@ namespace encv
 {
     extern mat4 ModelView;
     extern mat4 Projection;
+    extern mat4 TextureMatrix;
     extern vec3 materialAmbient;
     extern vec3 materialDiffuse;
     extern vec3 materialSpecular;

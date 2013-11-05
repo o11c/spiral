@@ -5,11 +5,10 @@ Usage:
     Optionally, edit ./config.h for the best experience on your platform.
 
     make
-    bin/spiral0 [args...]
+    bin/super [args...]
 
     The arguments are pass exactly as if typed after the program starts.
-    ./spiral1, ./spiral2, and ./spiral3 are wrapper scripts that give
-    the keys as required for the assignment.
+    ./super4 is a wrapper script that you probably want to always use.
 
     All of the geometry parameters are dynamically controlled;
     you may alter them by pressing keys. Lighting is hard-coded, however.
@@ -21,28 +20,31 @@ Usage:
     Also there are some special keys.
 
 Keys:
-    0: reset everything except the 1,2,3 toggles
-    1: toggle display of the spine curve.
+    0: reset everything except the 2,3,4 toggles
     2: toggle display of the mesh.
     3: toggle display of the shaded thing.
+    4: toggle textures
     8, 9: toggle display of each component of the mesh.
 
-    a, A: adjust torus major radius.
-    b, B: adjust torus minor radius.
-    r, R: adjust tube radius.
-    s, S: adjust tube second radius.
+    d, D: adjust torus radius
+    p, P: adjust warp
+    q, Q: adjust warp
 
-    p, P: adjust number of circuits.
-    q, Q: adjust number of wraps.
-
-    n, N: adjust spine resolution. Note that this is modified by p and q.
-    m, M: adjust tube resolution.
+    n, N: adjust mesh resolution.
+    m, M: adjust mesh resolution.
 
     e, E: adjust shininess exponent.
 
+    t: toggle sphere vs torus
+    a: toggle q correction
+
 Bugs:
     Something is wrong with the depth if you zoom in too much.
-    Certain small values of N cause kinks.
+
+    Something is wrong with the BMP reader. The images I originally
+    downloaded loaded, but with the wrong offset. This looks like
+    the BMP reader is not properly handling the "header length" set
+    in some BMP versions.
 
     This code is somewhat stressful to compilers. To see if yours works,
     check the buildbot results: https://travis-ci.org/o11c/spiral

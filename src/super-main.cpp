@@ -147,6 +147,9 @@ void display()
     encv::Projection = mat4();
     // no matter what I do, this seems to break down when rho < about 150
     encv::Projection.perspective(40, 1, rho / 50, rho * 2);
+    encv::TextureMatrix = mat4();
+    if (the_super->tor)
+        encv::TextureMatrix.scale({1, 2, 1});
     if (root_object)
         root_object->draw();
     glutSwapBuffers();
