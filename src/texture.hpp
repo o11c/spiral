@@ -11,10 +11,16 @@ struct color
     {}
 };
 
+struct image
+{
+    color *data;
+    int width, height;
+};
+
 struct sampler2D
 {
     unsigned int which, object;
-    sampler2D(unsigned which, color *rgba, unsigned w, unsigned h);
+    sampler2D(unsigned which, const image& img);
     ~sampler2D();
 };
 

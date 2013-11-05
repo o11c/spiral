@@ -8,6 +8,7 @@
 
 #include <limits>
 
+#include "bmp.hpp"
 #include "error.hpp"
 #include "super.hpp"
 #include "state.hpp"
@@ -257,14 +258,10 @@ int main(int argc, char **argv)
     root_object = &super;
     the_super = &super;
 
-    color red(255, 0, 0, 255);
-    color green(0, 255, 0, 255);
-    color blue(0, 0, 255, 255);
-
     checkOpenGLError();
-    sampler2D earth_lights(0, &red, 1, 1);
-    sampler2D earth_map(1, &green, 1, 1);
-    sampler2D earth_specular(2, &blue, 1, 1);
+    sampler2D earth_lights(0, Bmp("data/earthlights1k.bmp"));
+    sampler2D earth_map(1, Bmp("data/earthmap1k.bmp"));
+    sampler2D earth_specular(2, Bmp("data/earthspec1k.bmp"));
     checkOpenGLError();
 
     encv::ambient_texture = &earth_lights;
