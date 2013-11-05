@@ -6,24 +6,26 @@
 #include "drawing.hpp"
 #include "flat-program.hpp"
 #include "shade-program.hpp"
+#include "texture-program.hpp"
 
 class Super : public Drawing
 {
     FlatProgram *flat_program;
     ShadeProgram *shade_program;
+    TextureProgram *texture_program;
 public:
     float d; bool tor; bool a;
     float em, en;
     int dm, dn;
 
     bool mesh_rings, mesh_longs;
-    bool shade;
+    bool shade, texture;
 
     bool dirty_mesh;
 private:
     unsigned int mesh_points, mesh_norms, mesh_params, mesh_indices;
 public:
-    Super(FlatProgram *fp, ShadeProgram *sp);
+    Super(FlatProgram *fp, ShadeProgram *sp, TextureProgram *tp);
     ~Super();
 
     vec3 SE(float u, float v);

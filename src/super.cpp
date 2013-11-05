@@ -6,12 +6,14 @@
 #include "gl_wrap.hpp"
 #include "vector.hpp"
 
-Super::Super(FlatProgram *fp, ShadeProgram *sp)
+Super::Super(FlatProgram *fp, ShadeProgram *sp, TextureProgram *tp)
 : flat_program(fp)
 , shade_program(sp)
+, texture_program(tp)
 , mesh_rings(false)
 , mesh_longs(false)
 , shade(false)
+, texture(false)
 , dirty_mesh(true)
 {
     glGenBuffers(4, &mesh_points);
@@ -265,7 +267,10 @@ void Super::draw_mesh()
 void Super::draw_shade()
 {
     update_mesh();
-    shade_program->load();
+    if (texture)
+        texture_program->load();
+    else
+        shade_program->load();
 
     int N = dn;
     int M = dm;

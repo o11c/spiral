@@ -181,6 +181,9 @@ void keyboard(unsigned char key, int, int)
     case '3':
         toggle(the_super->shade);
         break;
+    case '4':
+        toggle(the_super->texture);
+        break;
     case '8':
         toggle(the_super->mesh_rings);
         break;
@@ -239,11 +242,14 @@ int main(int argc, char **argv)
     init_glut(argc, argv);
     FlatVertexShader fvs;
     ShadeVertexShader svs;
+    TextureVertexShader tvs;
     SimpleFragmentShader sfs;
     BetterFragmentShader bfs;
+    TextureFragmentShader tfs;
     FlatProgram fp(&fvs, &sfs);
     ShadeProgram sp(&svs, &bfs);
-    Super super(&fp, &sp);
+    TextureProgram tp(&tvs, &tfs);
+    Super super(&fp, &sp, &tp);
     root_object = &super;
     the_super = &super;
 
