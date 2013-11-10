@@ -151,9 +151,16 @@ void display()
     if (the_super->tor)
         encv::TextureMatrix.scale({1, 2, 1});
     if (root_object)
+    {
+        float angle = glutGet(GLUT_ELAPSED_TIME) / 180.0f * M_PI;
+        encv::View = encv::ModelView;
+        SavingMatrix sav(encv::ModelView);
+        encv::ModelView.rotate(angle, {0, 0, 1});
         root_object->draw();
+    }
     glutSwapBuffers();
     checkOpenGLError();
+    glutPostRedisplay();
 }
 
 static

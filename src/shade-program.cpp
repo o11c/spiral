@@ -57,7 +57,7 @@ void ShadeProgram::load()
     auto& materialSpecularValue = encv::materialSpecular;
     float materialShininessValue = /*int*/encv::materialShininess;
     auto& ambientLightValue = encv::ambientLight;
-    auto& lightPositionValue = encv::lightPosition;
+    vec3 lightPositionValue = (encv::View * vec4(encv::lightPosition, 1.0)).xyz();
     auto& lightColorValue = encv::lightColor;
 
     glUseProgram(program);

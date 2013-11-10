@@ -146,8 +146,15 @@ void display()
     // no matter what I do, this seems to break down when rho < about 150
     encv::Projection.perspective(40, 1, rho / 50, rho * 2);
     if (root_object)
+    {
+        float angle = glutGet(GLUT_ELAPSED_TIME) / 180.0f * M_PI;
+        encv::View = encv::ModelView;
+        SavingMatrix sav(encv::ModelView);
+        encv::ModelView.rotate(angle, {0, 0, 1});
         root_object->draw();
+    }
     glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 static

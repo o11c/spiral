@@ -54,6 +54,26 @@ const float& mat4::operator()(size_t r, size_t c) const
 {
     return data[c * 4 + r];
 }
+vec4 mat4::row(size_t r) const
+{
+    return
+    {
+        (*this)(r, 0),
+        (*this)(r, 1),
+        (*this)(r, 2),
+        (*this)(r, 3),
+    };
+}
+vec4 mat4::col(size_t c) const
+{
+    return
+    {
+        (*this)(0, c),
+        (*this)(1, c),
+        (*this)(2, c),
+        (*this)(3, c),
+    };
+}
 
 static
 void matrixSet4x4(mat4& M,
@@ -80,6 +100,17 @@ mat4 operator * (const mat4& A, const mat4& B)
             AB(r, c) = s;
         }
     return AB;
+}
+
+vec4 operator * (const mat4& M, const vec4& V)
+{
+    return
+    {
+        dot(M.row(0), V),
+        dot(M.row(1), V),
+        dot(M.row(2), V),
+        dot(M.row(3), V),
+    };
 }
 
 void mat4::operator *= (const mat4& A)

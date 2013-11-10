@@ -42,6 +42,8 @@ public:
     // indexing
     float& operator()(size_t r, size_t c);
     const float& operator()(size_t r, size_t c) const;
+    vec4 col(size_t c) const;
+    vec4 row(size_t r) const;
 
     float *ptr() { return data; }
     const float *ptr() const { return data; }
@@ -68,6 +70,7 @@ public:
 };
 
 mat4 operator * (const mat4& A, const mat4& B);
+vec4 operator * (const mat4& M, const vec4& V);
 
 class SavingMatrix
 {

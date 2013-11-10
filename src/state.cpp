@@ -5,6 +5,7 @@
 
 namespace encv
 {
+    mat4 View;
     mat4 ModelView;
     mat4 Projection;
     mat4 TextureMatrix;
@@ -13,7 +14,7 @@ namespace encv
     vec3 materialSpecular = {0.8, 0.8, 0.8};
     /*float*/int materialShininess = 12;
     vec3 ambientLight = {0.5, 0.5, 0.5};
-    vec3 lightPosition = {1000, 1000, 1000};
+    vec3 lightPosition = {1000, 1000, 0};
     vec3 lightColor = {1.0, 1.0, 1.0};
 
     sampler2D *ambient_texture = nullptr;

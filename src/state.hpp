@@ -7,6 +7,7 @@ class sampler2D;
 
 namespace encv
 {
+    extern mat4 View; // View is just ModelView at the beginning of time
     extern mat4 ModelView;
     extern mat4 Projection;
     extern mat4 TextureMatrix;

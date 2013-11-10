@@ -119,6 +119,8 @@ public:
     void t(float v) { data[1] = v; }
     void p(float v) { data[2] = v; }
     void q(float v) { data[3] = v; }
+
+    constexpr vec3 xyz() const { return {x(), y(), z()}; }
 private:
     float data[4];
 public:
