@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "gl_wrap.hpp"
-#include "vector.hpp"
+#include "../glue/gl_wrap.hpp"
+#include "../math/vector.hpp"
 
 Spine::Spine(FlatProgram *fp, ShadeProgram *sp)
 : flat_program(fp)

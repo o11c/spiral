@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "gl_wrap.hpp"
-#include "vector.hpp"
+#include "../glue/gl_wrap.hpp"
+#include "../math/vector.hpp"
 
 Super::Super(FlatProgram *fp, ShadeProgram *sp, TextureProgram *tp)
 : flat_program(fp)

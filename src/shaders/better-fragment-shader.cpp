@@ -1,16 +1,16 @@
-#include "shade-vertex-shader.hpp"
+#include "better-fragment-shader.hpp"
 
 #include <cstdio>
 
-#include "error.hpp"
-#include "gl_wrap.hpp"
+#include "../glue/error.hpp"
+#include "../glue/gl_wrap.hpp"
 
-ShadeVertexShader::ShadeVertexShader()
+BetterFragmentShader::BetterFragmentShader()
 {
-    shader = glCreateShader(GL_VERTEX_SHADER);
+    shader = glCreateShader(GL_FRAGMENT_SHADER);
 
     const char *source =
-#include "vertex-shaded.glsl.h"
+#include "fragment-better.glsl.h"
     ;
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
@@ -21,7 +21,7 @@ ShadeVertexShader::ShadeVertexShader()
     {
         GLchar buf[length];
         glGetShaderInfoLog(shader, length, &length, buf);
-        printf("compiling shaded vertex shader:\n%s\n\n", buf);
+        printf("compiling better fragment shader:\n%s\n\n", buf);
     }
 
     GLint success = 0;
@@ -30,7 +30,7 @@ ShadeVertexShader::ShadeVertexShader()
         barf();
 }
 
-ShadeVertexShader::~ShadeVertexShader()
+BetterFragmentShader::~BetterFragmentShader()
 {
     glDeleteShader(shader);
 }

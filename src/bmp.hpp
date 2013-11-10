@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 
-#include "texture.hpp"
+#include "glue/texture.hpp"
 
 typedef struct {            /* Image read from BMP image */
   int W, H;                 /* width and height of image */

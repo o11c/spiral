@@ -1,16 +1,16 @@
-#include "texture-fragment-shader.hpp"
+#include "flat-vertex-shader.hpp"
 
 #include <cstdio>
 
-#include "error.hpp"
-#include "gl_wrap.hpp"
+#include "../glue/error.hpp"
+#include "../glue/gl_wrap.hpp"
 
-TextureFragmentShader::TextureFragmentShader()
+FlatVertexShader::FlatVertexShader()
 {
-    shader = glCreateShader(GL_FRAGMENT_SHADER);
+    shader = glCreateShader(GL_VERTEX_SHADER);
 
     const char *source =
-#include "fragment-texture.glsl.h"
+#include "vertex-flat.glsl.h"
     ;
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
@@ -21,7 +21,7 @@ TextureFragmentShader::TextureFragmentShader()
     {
         GLchar buf[length];
         glGetShaderInfoLog(shader, length, &length, buf);
-        printf("compiling texture fragment shader:\n%s\n\n", buf);
+        printf("compiling flat vertex shader:\n%s\n\n", buf);
     }
 
     GLint success = 0;
@@ -30,7 +30,7 @@ TextureFragmentShader::TextureFragmentShader()
         barf();
 }
 
-TextureFragmentShader::~TextureFragmentShader()
+FlatVertexShader::~FlatVertexShader()
 {
     glDeleteShader(shader);
 }

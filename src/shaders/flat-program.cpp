@@ -1,14 +1,13 @@
-#include "shade-program.hpp"
+#include "flat-program.hpp"
 
 #include <cstdio>
 
-#include "error.hpp"
-#include "gl_wrap.hpp"
-#include "uniforms.hpp"
+#include "../glue/error.hpp"
+#include "../glue/gl_wrap.hpp"
+#include "../state.hpp"
+#include "../glue/uniforms.hpp"
 
-#include "state.hpp"
-
-ShadeProgram::ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f)
+FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
 : vs(v), fs(f)
 {
     program = glCreateProgram();
@@ -23,7 +22,7 @@ ShadeProgram::ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f)
     {
         GLchar buf[length];
         glGetProgramInfoLog(program, length, &length, buf);
-        printf("linking shaded program:\n%s\n\n", buf);
+        printf("linking flat program:\n%s\n\n", buf);
     }
 
     GLint success = 0;
@@ -37,34 +36,24 @@ ShadeProgram::ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f)
 #define UNIFORM(name, type)                                 \
     name##Uniform = glGetUniformLocation(program, #name);   \
     if (name##Uniform == -1) barf();
-#include "vertex-shaded.glsl.def"
+#include "vertex-flat.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
 
-ShadeProgram::~ShadeProgram()
+FlatProgram::~FlatProgram()
 {
     glDeleteProgram(program);
 }
 
-void ShadeProgram::load()
+void FlatProgram::load()
 {
     mat4 ModelViewProjectionValue = encv::Projection * encv::ModelView;
-    auto& ModelViewValue = encv::ModelView;
-    mat3 NormalMatrixValue = encv::ModelView.get_normal();
-    auto& materialAmbientValue = encv::materialAmbient;
-    auto& materialDiffuseValue = encv::materialDiffuse;
-    auto& materialSpecularValue = encv::materialSpecular;
-    float materialShininessValue = /*int*/encv::materialShininess;
-    auto& ambientLightValue = encv::ambientLight;
-    vec3 lightPositionValue = (encv::View * vec4(encv::lightPosition, 1.0)).xyz();
-    auto& lightColorValue = encv::lightColor;
 
     glUseProgram(program);
 #define ATTRIBUTE(name, type)   /**/
 #define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
-#include "vertex-shaded.glsl.def"
+#include "vertex-flat.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
-

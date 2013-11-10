@@ -4,7 +4,7 @@
 #include "texture-vertex-shader.hpp"
 #include "texture-fragment-shader.hpp"
 
-#include "matrix.hpp"
+#include "../math/matrix.hpp"
 
 class TextureProgram
 {

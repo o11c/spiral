@@ -1,7 +1,7 @@
 #ifndef GL_WRAP_HPP
 #define GL_WRAP_HPP
 
-#include "../config.h"
+#include "../../config.h"
 
 #if USE_GLES_HACK and not defined(GL_WRAP_GLUT)
 # include <GLES2/gl2.h>

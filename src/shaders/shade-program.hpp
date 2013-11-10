@@ -4,7 +4,7 @@
 #include "shade-vertex-shader.hpp"
 #include "better-fragment-shader.hpp"
 
-#include "matrix.hpp"
+#include "../math/matrix.hpp"
 
 class ShadeProgram
 {

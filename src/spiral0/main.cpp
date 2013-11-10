@@ -1,18 +1,15 @@
 #define GL_WRAP_GLUT
-#include "gl_wrap.hpp"
+#include "../glue/gl_wrap.hpp"
 
-#include "../config.h"
+#include "../../config.h"
 
 #include <cmath>
 #include <cstdio>
 
 #include <limits>
 
-#include "bmp.hpp"
-#include "error.hpp"
-#include "super.hpp"
-#include "state.hpp"
-#include "texture.hpp"
+#include "spine.hpp"
+#include "../state.hpp"
 
 const float UP_SCALE  = (16.f/15.f);
 const float DOWN_SCALE = (15.f/16.f);
@@ -53,7 +50,7 @@ void toggle(bool& b)
 
 
 Drawing *root_object = nullptr;
-Super *the_super = nullptr;
+Spine *the_spine = nullptr;
 
 float rho;
 float theta, phi;
@@ -62,18 +59,19 @@ int sx, sy;
 static
 void reset()
 {
-    rho = 5;
+    rho = 500;
     theta = 45 * M_PI/180;
     phi = 45 * M_PI/180;
-    the_super->tor = false;
-    the_super->a = true;
-    the_super->d = 1.5f;
-    the_super->em = 4;
-    the_super->en = 4;
-    the_super->dn = 32;
-    the_super->dm = 32;
+    the_spine->a = 100;
+    the_spine->b = 40;
+    the_spine->r = 10;
+    the_spine->s = 10;
+    the_spine->p = 2;
+    the_spine->q = 5;
+    the_spine->n = 10;
+    the_spine->m = 10;
 
-    the_super->mesh_rings = the_super->mesh_longs;
+    the_spine->mesh_rings = the_spine->mesh_longs;
 }
 
 static
@@ -99,7 +97,7 @@ void mouse(int button, int state, int x, int y)
     // they are always delivered as button events
     if (button == 3)
     {
-        dec(1e0, rho);
+        dec(1e1, rho);
         glutPostRedisplay();
         return;
     }
@@ -123,18 +121,18 @@ void mouse(int button, int state, int x, int y)
 static
 void display()
 {
-    checkOpenGLError();
     const char *noyes[2] = {"no", "yes"};
     printf("Drawing:\n");
-    printf("    mesh_rings: %s\n", noyes[the_super->mesh_rings]);
-    printf("    mesh_longs: %s\n", noyes[the_super->mesh_longs]);
-    printf("    shade: %s\n", noyes[the_super->shade]);
+    printf("    spine: %s\n", noyes[the_spine->spine]);
+    printf("    mesh_rings: %s\n", noyes[the_spine->mesh_rings]);
+    printf("    mesh_longs: %s\n", noyes[the_spine->mesh_longs]);
+    printf("    shade: %s\n", noyes[the_spine->shade]);
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
-    if (the_super->tor)
-        printf("    (d) = (%f)\n", the_super->d);
-    printf("    (n, m) = (%f, %f)\n", the_super->en, the_super->em);
-    printf("    (N, M) = (%d, %d)\n", the_super->dn, the_super->dm);
-    printf("    dirty mesh: %s\n", noyes[the_super->dirty_mesh]);
+    printf("    (a, b, r, s) = (%f, %f, %f, %f)\n", the_spine->a, the_spine->b, the_spine->r, the_spine->s);
+    printf("    (p, q) = (%d, %d)\n", the_spine->p, the_spine->q);
+    printf("    (n, m) = (%d, %d)\n", the_spine->n, the_spine->m);
+    printf("    dirty spine: %s\n", noyes[the_spine->dirty_spine]);
+    printf("    dirty mesh: %s\n", noyes[the_spine->dirty_mesh]);
     printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
 
@@ -147,9 +145,6 @@ void display()
     encv::Projection = mat4();
     // no matter what I do, this seems to break down when rho < about 150
     encv::Projection.perspective(40, 1, rho / 50, rho * 2);
-    encv::TextureMatrix = mat4();
-    if (the_super->tor)
-        encv::TextureMatrix.scale({1, 2, 1});
     if (root_object)
     {
         float angle = glutGet(GLUT_ELAPSED_TIME) / 180.0f * M_PI;
@@ -159,7 +154,6 @@ void display()
         root_object->draw();
     }
     glutSwapBuffers();
-    checkOpenGLError();
     glutPostRedisplay();
 }
 
@@ -189,44 +183,45 @@ void keyboard(unsigned char key, int, int)
     case '0':
         reset();
         break;
+    case '1':
+        toggle(the_spine->spine);
+        break;
     case '2':
-        toggle(the_super->mesh_rings);
-        toggle(the_super->mesh_longs);
+        toggle(the_spine->mesh_rings);
+        toggle(the_spine->mesh_longs);
         break;
     case '3':
-        toggle(the_super->shade);
-        break;
-    case '4':
-        toggle(the_super->texture);
+        toggle(the_spine->shade);
         break;
     case '8':
-        toggle(the_super->mesh_rings);
+        toggle(the_spine->mesh_rings);
         break;
     case '9':
-        toggle(the_super->mesh_longs);
+        toggle(the_spine->mesh_longs);
         break;
-    case 't':
-        toggle(the_super->tor);
-        break;
-    case 'a':
-        toggle(the_super->a);
-        break;
+    case 'a': dec(1, the_spine->a); break;
+    case 'A': inc(the_spine->a, 1e3); break;
+    case 'b': dec(1, the_spine->b); break;
+    case 'B': inc(the_spine->b, 1e3); break;
     case 'e': dec(1, encv::materialShininess); break;
     case 'E': inc(encv::materialShininess, 50); break;
-    case 'd': dec(0.1f, the_super->d); break;
-    case 'D': inc(the_super->d, 10.f); break;
-    case 'p': dec(1, the_super->en); break;
-    case 'P': inc(the_super->en, 100); break;
-    case 'q': dec(1, the_super->em); break;
-    case 'Q': inc(the_super->em, 100); break;
-    case 'n': dec(3, the_super->dn); break;
-    case 'N': inc(the_super->dn, 100); break;
-    case 'm': dec(3, the_super->dm); break;
-    case 'M': inc(the_super->dm, 100); break;
+    case 'r': dec(1, the_spine->r); // fallthrough
+    case 's': dec(1, the_spine->s); break;
+    case 'R': inc(the_spine->r, 1e3); // fallthrough
+    case 'S': inc(the_spine->s, 1e3); break;
+    case 'p': dec(1, the_spine->p); break;
+    case 'P': inc(the_spine->p, 100); break;
+    case 'q': dec(1, the_spine->q); break;
+    case 'Q': inc(the_spine->q, 100); break;
+    case 'n': dec(3, the_spine->n); break;
+    case 'N': inc(the_spine->n, 100); break;
+    case 'm': dec(3, the_spine->m); break;
+    case 'M': inc(the_spine->m, 100); break;
     default:
         return;
     }
-    the_super->dirty_mesh = true;
+    the_spine->dirty_spine = true;
+    the_spine->dirty_mesh = true;
     glutPostRedisplay();
 }
 
@@ -237,7 +232,7 @@ void init_glut(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(500,500);
     glutInitWindowPosition(10,10);
-    glutCreateWindow("Superquadric");
+    glutCreateWindow("Toroidal Spiral");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
@@ -257,26 +252,13 @@ int main(int argc, char **argv)
     init_glut(argc, argv);
     FlatVertexShader fvs;
     ShadeVertexShader svs;
-    TextureVertexShader tvs;
     SimpleFragmentShader sfs;
     BetterFragmentShader bfs;
-    TextureFragmentShader tfs;
     FlatProgram fp(&fvs, &sfs);
     ShadeProgram sp(&svs, &bfs);
-    TextureProgram tp(&tvs, &tfs);
-    Super super(&fp, &sp, &tp);
-    root_object = &super;
-    the_super = &super;
-
-    checkOpenGLError();
-    sampler2D earth_lights(0, Bmp("data/earthlights1k.bmp"));
-    sampler2D earth_map(1, Bmp("data/earthmap1k.bmp"));
-    sampler2D earth_specular(2, Bmp("data/earthspec1k.bmp"));
-    checkOpenGLError();
-
-    encv::ambient_texture = &earth_lights;
-    encv::diffuse_texture = &earth_map;
-    encv::specular_texture = &earth_specular;
+    Spine spine(&fp, &sp);
+    root_object = &spine;
+    the_spine = &spine;
 
     // the donut is reddish, so make the background the opposite
     // this also makes the dark parts of the mesh visible
@@ -285,17 +267,13 @@ int main(int argc, char **argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    checkOpenGLError();
     reset();
     for (int i = 1; i < argc; ++i)
         for (char *a = argv[i]; *a; ++a)
             keyboard(*a, 0, 0);
-
-    checkOpenGLError();
-
     glutMainLoop();
 
-    the_super = nullptr;
+    the_spine = nullptr;
     root_object = nullptr;
     puts("Everything is OK");
 }

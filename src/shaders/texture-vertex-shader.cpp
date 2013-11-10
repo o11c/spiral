@@ -2,8 +2,8 @@
 
 #include <cstdio>
 
-#include "error.hpp"
-#include "gl_wrap.hpp"
+#include "../glue/error.hpp"
+#include "../glue/gl_wrap.hpp"
 
 TextureVertexShader::TextureVertexShader()
 {

@@ -1,7 +1,7 @@
 #include "state.hpp"
 
-#include "matrix.hpp"
-#include "texture.hpp"
+#include "math/matrix.hpp"
+#include "glue/texture.hpp"
 
 namespace encv
 {

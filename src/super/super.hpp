@@ -1,12 +1,12 @@
 #ifndef SPINE_HPP
 #define SPINE_HPP
 
-#include "../config.h"
+#include "../../config.h"
 
-#include "drawing.hpp"
-#include "flat-program.hpp"
-#include "shade-program.hpp"
-#include "texture-program.hpp"
+#include "../drawing.hpp"
+#include "../shaders/flat-program.hpp"
+#include "../shaders/shade-program.hpp"
+#include "../shaders/texture-program.hpp"
 
 class Super : public Drawing
 {

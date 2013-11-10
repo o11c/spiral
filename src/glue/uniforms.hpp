@@ -2,7 +2,7 @@
 #define UNIFORMS_HPP
 
 #include "gl_wrap.hpp"
-#include "matrix.hpp"
+#include "../math/matrix.hpp"
 #include "texture.hpp"
 
 inline

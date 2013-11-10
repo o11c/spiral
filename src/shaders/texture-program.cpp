@@ -2,11 +2,11 @@
 
 #include <cstdio>
 
-#include "error.hpp"
-#include "gl_wrap.hpp"
-#include "uniforms.hpp"
+#include "../glue/error.hpp"
+#include "../glue/gl_wrap.hpp"
+#include "../glue/uniforms.hpp"
 
-#include "state.hpp"
+#include "../state.hpp"
 
 TextureProgram::TextureProgram(TextureVertexShader *v, TextureFragmentShader *f)
 : vs(v), fs(f)

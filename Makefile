@@ -1,13 +1,13 @@
 prefix=/usr/local
 bindir=${prefix}/bin
 
-SOURCES := $(wildcard src/*.cpp)
-HEADERS := $(wildcard src/*.hpp)
+SOURCES := $(shell find src -name '*.cpp')
+HEADERS := $(shell find src -name '*.hpp')
 DEPENDS := $(patsubst src/%.cpp,obj/%.d,${SOURCES})
 ALL_OBJECTS := $(patsubst %.d,%.o,${DEPENDS})
-MAIN_OBJECTS := $(filter %-main.o,${ALL_OBJECTS})
-NORM_OBJECTS := $(filter-out %-main.o,${ALL_OBJECTS})
-PROGRAMS := $(patsubst obj/%-main.o,bin/%,${MAIN_OBJECTS})
+MAIN_OBJECTS := $(filter %/main.o,${ALL_OBJECTS})
+NORM_OBJECTS := $(filter-out %/main.o,${ALL_OBJECTS})
+PROGRAMS := $(patsubst obj/%/main.o,bin/%,${MAIN_OBJECTS})
 
 CXXFLAGS = -g -O2 -march=native
 CXXFLAGS += ${WARNINGS}
@@ -47,7 +47,7 @@ obj/%.o: src/%.cpp
 
 include ${DEPENDS}
 
-bin/%: obj/%-main.o ${NORM_OBJECTS}
+bin/%: obj/%/main.o ${NORM_OBJECTS}
 	$(MKDIR_FIRST)
 	${CXX} ${LDFLAGS} $^ ${LDLIBS} -o $@
 
