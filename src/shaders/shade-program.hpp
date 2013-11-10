@@ -15,6 +15,7 @@ class ShadeProgram
 #define ATTRIBUTE(name, type)   public: int name##Attribute;
 #define UNIFORM(name, type)     private: int name##Uniform;
 #include "vertex-shaded.glsl.def"
+#include "fragment-better.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 public:

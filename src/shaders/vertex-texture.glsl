@@ -6,13 +6,6 @@ uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform mat3 NormalMatrix;
 uniform mat4 TextureMatrix;
-uniform sampler2D ambient_texture;
-uniform sampler2D diffuse_texture;
-uniform sampler2D specular_texture;
-uniform float materialShininess;
-uniform vec3 ambientLight;
-uniform vec3 lightPosition;
-uniform vec3 lightColor;
 
 varying vec4 frag_param;
 varying vec3 frag_normal;

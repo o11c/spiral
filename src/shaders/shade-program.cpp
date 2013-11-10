@@ -38,6 +38,7 @@ ShadeProgram::ShadeProgram(ShadeVertexShader *v, BetterFragmentShader *f)
     name##Uniform = glGetUniformLocation(program, #name);   \
     if (name##Uniform == -1) barf();
 #include "vertex-shaded.glsl.def"
+#include "fragment-better.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
@@ -64,6 +65,7 @@ void ShadeProgram::load()
 #define ATTRIBUTE(name, type)   /**/
 #define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
 #include "vertex-shaded.glsl.def"
+#include "fragment-better.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }

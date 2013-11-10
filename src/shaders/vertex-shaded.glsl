@@ -5,13 +5,6 @@ attribute vec4 param;
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform mat3 NormalMatrix;
-uniform vec3 materialAmbient;
-uniform vec3 materialDiffuse;
-uniform vec3 materialSpecular;
-uniform float materialShininess;
-uniform vec3 ambientLight;
-uniform vec3 lightPosition;
-uniform vec3 lightColor;
 
 varying vec4 frag_param;
 varying vec3 frag_normal;

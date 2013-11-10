@@ -38,6 +38,7 @@ TextureProgram::TextureProgram(TextureVertexShader *v, TextureFragmentShader *f)
     name##Uniform = glGetUniformLocation(program, #name);   \
     if (name##Uniform == -1) barf();
 #include "vertex-texture.glsl.def"
+#include "fragment-texture.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
@@ -65,6 +66,7 @@ void TextureProgram::load()
 #define ATTRIBUTE(name, type)   /**/
 #define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
 #include "vertex-texture.glsl.def"
+#include "fragment-texture.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }

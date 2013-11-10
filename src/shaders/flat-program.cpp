@@ -37,6 +37,7 @@ FlatProgram::FlatProgram(FlatVertexShader *v, SimpleFragmentShader *f)
     name##Uniform = glGetUniformLocation(program, #name);   \
     if (name##Uniform == -1) barf();
 #include "vertex-flat.glsl.def"
+#include "fragment-simple.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }
@@ -54,6 +55,7 @@ void FlatProgram::load()
 #define ATTRIBUTE(name, type)   /**/
 #define UNIFORM(name, type)     load_uniform_##type(name##Uniform, name##Value);
 #include "vertex-flat.glsl.def"
+#include "fragment-simple.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 }

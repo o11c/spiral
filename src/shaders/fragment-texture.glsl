@@ -2,9 +2,6 @@ varying vec4 frag_param;
 varying vec3 frag_normal;
 varying vec4 frag_P;
 
-uniform mat4 ModelViewProjection;
-uniform mat4 ModelView;
-uniform mat3 NormalMatrix;
 uniform sampler2D ambient_texture;
 uniform sampler2D diffuse_texture;
 uniform sampler2D specular_texture;

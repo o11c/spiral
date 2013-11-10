@@ -13,6 +13,7 @@ class FlatProgram
 #define ATTRIBUTE(name, type)   public: int name##Attribute;
 #define UNIFORM(name, type)     private: int name##Uniform;
 #include "vertex-flat.glsl.def"
+#include "fragment-simple.glsl.def"
 #undef ATTRIBUTE
 #undef UNIFORM
 public:
