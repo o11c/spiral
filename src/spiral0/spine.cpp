@@ -25,27 +25,27 @@ Spine::~Spine()
 
 vec3 Spine::C(float t)
 {
-    float x = (a + b * cos(q * t)) * cos(p * t);
-    float y = (a + b * cos(q * t)) * sin(p * t);
-    float z = b * sin(q * t);
+    float x = (a + b * cosf(q * t)) * cosf(p * t);
+    float y = (a + b * cosf(q * t)) * sinf(p * t);
+    float z = b * sinf(q * t);
     return {x, y, z};
 }
 vec3 Spine::T(float t)
 {
     // in CSE we trust
     vec3 c = C(t);
-    float dx = -p * c.y() - b * q * sin(q * t) * cos(p * t);
-    float dy = p * c.x() - b * q * sin(q * t) * sin(p * t);
-    float dz = b * q * cos(q * t);
+    float dx = -p * c.y() - b * q * sinf(q * t) * cosf(p * t);
+    float dy = p * c.x() - b * q * sinf(q * t) * sinf(p * t);
+    float dz = b * q * cosf(q * t);
     return {dx, dy, dz};
 }
 
 vec3 Spine::A(float t)
 {
     vec3 d = T(t);
-    float ax = -p * d.y() + b * q * (p * sin(q * t) * sin(p * t) - q * cos(q * t) * cos(p * t));
-    float ay = p * d.x() - b * q * (p * sin(q * t) * cos(p * t) + q * cos(q * t) * sin(p * t));
-    float az = -b * q * q * sin(q * t);
+    float ax = -p * d.y() + b * q * (p * sinf(q * t) * sinf(p * t) - q * cosf(q * t) * cosf(p * t));
+    float ay = p * d.x() - b * q * (p * sinf(q * t) * cosf(p * t) + q * cosf(q * t) * sinf(p * t));
+    float az = -b * q * q * sinf(q * t);
     return {ax, ay, az};
 }
 
@@ -144,9 +144,9 @@ void Spine::update_mesh()
         {
             float u = 2 * M_PI * j / M;
             params[i * (M + 1) + j] = {float(i) / N, float(j) / M, 0, 1};
-            norms[i * (M + 1) + j] = s * cos(u) * Bt + r * sin(u) * Nt;
+            norms[i * (M + 1) + j] = s * cosf(u) * Bt + r * sinf(u) * Nt;
             norm3(norms[i * (M + 1) + j]);
-            points[i * (M + 1) + j] = Ct + r * cos(u) * Bt + s * sin(u) * Nt;
+            points[i * (M + 1) + j] = Ct + r * cosf(u) * Bt + s * sinf(u) * Nt;
             if (i == N)
                 continue;
             quad_indices[i * (M + 1) + j] = {

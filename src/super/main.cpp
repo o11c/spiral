@@ -141,7 +141,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     encv::ModelView = mat4();
     encv::ModelView.lookat(
-            rho * vec3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi)),
+            rho * vec3(sinf(phi) * cosf(theta), sinf(phi) * sinf(theta), cosf(phi)),
             {0, 0, 0},
             {0, 0, 1});
     encv::Projection = mat4();

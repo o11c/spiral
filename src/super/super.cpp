@@ -33,25 +33,25 @@ float safe_pow(float base, float expon)
 
 vec3 Super::SE(float u, float v)
 {
-    float x = safe_pow(cos(v), 2/em) * safe_pow(cos(u), 2/en);
-    float y = safe_pow(cos(v), 2/em) * safe_pow(sin(u), 2/en);
-    float z = safe_pow(sin(v), 2/em);
+    float x = safe_pow(cosf(v), 2/em) * safe_pow(cosf(u), 2/en);
+    float y = safe_pow(cosf(v), 2/em) * safe_pow(sinf(u), 2/en);
+    float z = safe_pow(sinf(v), 2/em);
     return {x, y, z};
 }
 
 vec3 Super::ST(float u, float v)
 {
-    float x = (d + safe_pow(cos(v), 2/em)) * safe_pow(cos(u), 2/en);
-    float y = (d + safe_pow(cos(v), 2/em)) * safe_pow(sin(u), 2/en);
-    float z = safe_pow(sin(v), 2/em);
+    float x = (d + safe_pow(cosf(v), 2/em)) * safe_pow(cosf(u), 2/en);
+    float y = (d + safe_pow(cosf(v), 2/em)) * safe_pow(sinf(u), 2/en);
+    float z = safe_pow(sinf(v), 2/em);
     return {x, y, z};
 }
 
 vec3 Super::SN(float u, float v)
 {
-    float x = safe_pow(cos(v), 2 - 2/em) * safe_pow(cos(u), 2 - 2/en);
-    float y = safe_pow(cos(v), 2 - 2/em) * safe_pow(sin(u), 2 - 2/en);
-    float z = safe_pow(sin(v), 2 - 2/em);
+    float x = safe_pow(cosf(v), 2 - 2/em) * safe_pow(cosf(u), 2 - 2/en);
+    float y = safe_pow(cosf(v), 2 - 2/em) * safe_pow(sinf(u), 2 - 2/en);
+    float z = safe_pow(sinf(v), 2 - 2/em);
     return {x, y, z};
 }
 
