@@ -1,6 +1,7 @@
 #include "super.hpp"
 
 #include <cmath>
+#include <cstdio>
 
 #include "../glue/gl_wrap.hpp"
 #include "../math/vector.hpp"
@@ -67,6 +68,7 @@ void Super::update_mesh()
 {
     if (!dirty_mesh)
         return;
+    //en = em = 2;
     int N = dn;
     int M = dm;
     dirty_mesh = false;
@@ -182,6 +184,54 @@ void Super::update_mesh()
             params[INDEX(i, j)] = {s * q, t * q, 0, 1 * q};
         }
     }
+
+    char filename[256];
+    sprintf(filename, "data/super-%.10e-%.10e,%.10e-%d,%d.mesh",
+            tor ? d : 0.0f,
+            em, en,
+            dm, dn);
+    FILE *fp = fopen(filename, "w");
+    fprintf(fp, "textures:\n");
+    fprintf(fp, "  day: data/earthmap1k.bmp\n");
+    fprintf(fp, "  night: data/earthlights1k.bmp\n");
+    fprintf(fp, "  shiny: data/earthspec1k.bmp\n");
+
+    fprintf(fp, "\nvertices:\n");
+    for (int i = 0; i < (N + 1) * (M + 1); ++i)
+    {
+        auto p = vec4(points[i], 1.0f);
+        auto t = params[i];
+        auto n = vec4(norms[i], 1.0f);
+        fprintf(fp, "  - position: [%.10e, %.10e, %.10e, %.10e]\n", p.x, p.y, p.z, p.w);
+        fprintf(fp, "    texture: [%.10e, %.10e, %.10e, %.10e]\n", t.x, t.y, t.z, t.w);
+        fprintf(fp, "    normal: [%.10e, %.10e, %.10e, %.10e]\n", n.x, n.y, n.z, n.w);
+    }
+
+    fprintf(fp, "\nfaces:\n");
+    for (int j = 1; j < N * ((M + 1) + 2) - 2; ++j)
+    {
+        ivec3 f1 =
+        {
+            quad_indices[j - 1].a,
+            quad_indices[j - 1].b,
+            quad_indices[j].a,
+        };
+        ivec3 f2 =
+        {
+            quad_indices[j - 1].b,
+            quad_indices[j].a,
+            quad_indices[j].b,
+        };
+        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f1.x, f1.y, f1.z);
+        fprintf(fp, "    ambient: night\n");
+        fprintf(fp, "    diffuse: day\n");
+        fprintf(fp, "    specular: shiny\n");
+        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f2.x, f2.y, f2.z);
+        fprintf(fp, "    ambient: night\n");
+        fprintf(fp, "    diffuse: day\n");
+        fprintf(fp, "    specular: shiny\n");
+    }
+    fclose(fp);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
     glBufferData(GL_ARRAY_BUFFER,

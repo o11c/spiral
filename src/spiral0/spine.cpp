@@ -1,6 +1,7 @@
 #include "spine.hpp"
 
 #include <cmath>
+#include <cstdio>
 
 #include "../glue/gl_wrap.hpp"
 #include "../math/vector.hpp"
@@ -146,7 +147,7 @@ void Spine::update_mesh()
         {
             Turns u_(j, M);
             Radians u = u_;
-            params[i * (M + 1) + j] = {t_.value(), u_.value(), 0, 1};
+            params[i * (M + 1) + j] = {t_.value() * q, u_.value(), 0, 1};
             norms[i * (M + 1) + j] = s * cos_(u) * Bt + r * sin_(u) * Nt;
             norm3(norms[i * (M + 1) + j]);
             points[i * (M + 1) + j] = Ct + r * cos_(u) * Bt + s * sin_(u) * Nt;
@@ -158,6 +159,52 @@ void Spine::update_mesh()
             };
         }
     }
+    char filename[256];
+    sprintf(filename, "data/spiral-%.10e,%.10e,%.10e,%.10e-%d,%d,%d,%d.mesh",
+            a, b, r, s,
+            p, q, N, M);
+    FILE *fp = fopen(filename, "w");
+    fprintf(fp, "textures:\n");
+    fprintf(fp, "  day: data/earthmap1k.bmp\n");
+    fprintf(fp, "  night: data/earthlights1k.bmp\n");
+    fprintf(fp, "  shiny: data/earthspec1k.bmp\n");
+
+    fprintf(fp, "\nvertices:\n");
+    for (int i = 0; i < (N + 1) * (M + 1); ++i)
+    {
+        auto p = vec4(points[i], 1.0f);
+        auto t = params[i];
+        auto n = vec4(norms[i], 1.0f);
+        fprintf(fp, "  - position: [%.10e, %.10e, %.10e, %.10e]\n", p.x, p.y, p.z, p.w);
+        fprintf(fp, "    texture: [%.10e, %.10e, %.10e, %.10e]\n", t.x * this->q, t.y, t.z, t.w);
+        fprintf(fp, "    normal: [%.10e, %.10e, %.10e, %.10e]\n", n.x, n.y, n.z, n.w);
+    }
+
+    fprintf(fp, "\nfaces:\n");
+    for (int j = 1; j < N * (M + 1); ++j)
+    {
+        ivec3 f1 =
+        {
+            quad_indices[j - 1].a,
+            quad_indices[j - 1].b,
+            quad_indices[j].a,
+        };
+        ivec3 f2 =
+        {
+            quad_indices[j - 1].b,
+            quad_indices[j].a,
+            quad_indices[j].b,
+        };
+        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f1.x, f1.y, f1.z);
+        fprintf(fp, "    ambient: night\n");
+        fprintf(fp, "    diffuse: day\n");
+        fprintf(fp, "    specular: shiny\n");
+        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f2.x, f2.y, f2.z);
+        fprintf(fp, "    ambient: night\n");
+        fprintf(fp, "    diffuse: day\n");
+        fprintf(fp, "    specular: shiny\n");
+    }
+    fclose(fp);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
     glBufferData(GL_ARRAY_BUFFER,
