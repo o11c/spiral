@@ -5,14 +5,14 @@
 #include "vector.hpp"
 #include "matrix.hpp"
 
-quat::quat(float angle, vec3 axis)
+quat::quat(Radians angle, vec3 axis)
 {
-    float angle2 = angle / 2;
-    float s = sinf(angle2);
+    Radians angle2 = angle / 2;
+    float s = sin_(angle2);
     x = axis.x * s;
     y = axis.y * s;
     z = axis.z * s;
-    w = cosf(angle2);
+    w = cos_(angle2);
 }
 
 quat::operator mat4() const

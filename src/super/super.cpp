@@ -31,27 +31,27 @@ float safe_pow(float base, float expon)
     return pow(base, expon);
 }
 
-vec3 Super::SE(float u, float v)
+vec3 Super::SE(Radians u, Radians v)
 {
-    float x = safe_pow(cosf(v), 2/em) * safe_pow(cosf(u), 2/en);
-    float y = safe_pow(cosf(v), 2/em) * safe_pow(sinf(u), 2/en);
-    float z = safe_pow(sinf(v), 2/em);
+    float x = safe_pow(cos_(v), 2/em) * safe_pow(cos_(u), 2/en);
+    float y = safe_pow(cos_(v), 2/em) * safe_pow(sin_(u), 2/en);
+    float z = safe_pow(sin_(v), 2/em);
     return {x, y, z};
 }
 
-vec3 Super::ST(float u, float v)
+vec3 Super::ST(Radians u, Radians v)
 {
-    float x = (d + safe_pow(cosf(v), 2/em)) * safe_pow(cosf(u), 2/en);
-    float y = (d + safe_pow(cosf(v), 2/em)) * safe_pow(sinf(u), 2/en);
-    float z = safe_pow(sinf(v), 2/em);
+    float x = (d + safe_pow(cos_(v), 2/em)) * safe_pow(cos_(u), 2/en);
+    float y = (d + safe_pow(cos_(v), 2/em)) * safe_pow(sin_(u), 2/en);
+    float z = safe_pow(sin_(v), 2/em);
     return {x, y, z};
 }
 
-vec3 Super::SN(float u, float v)
+vec3 Super::SN(Radians u, Radians v)
 {
-    float x = safe_pow(cosf(v), 2 - 2/em) * safe_pow(cosf(u), 2 - 2/en);
-    float y = safe_pow(cosf(v), 2 - 2/em) * safe_pow(sinf(u), 2 - 2/en);
-    float z = safe_pow(sinf(v), 2 - 2/em);
+    float x = safe_pow(cos_(v), 2 - 2/em) * safe_pow(cos_(u), 2 - 2/en);
+    float y = safe_pow(cos_(v), 2 - 2/em) * safe_pow(sin_(u), 2 - 2/en);
+    float z = safe_pow(sin_(v), 2 - 2/em);
     return {x, y, z};
 }
 
@@ -82,11 +82,12 @@ void Super::update_mesh()
     for (int i = 0; i <= N; ++i)
     {
         float t = float(i) / N;
-        float v = (2.0f * t - 1.0f);
+        float v_ = (2.0f * t - 1.0f);
         if (tor)
-            v *= M_PI;
+            v_ *= M_PI;
         else
-            v *= M_PI_2;
+            v_ *= M_PI_2;
+        Radians v = Radians(v_);
 
         if (i != 0 && i != N)
         {
@@ -98,8 +99,9 @@ void Super::update_mesh()
         for (int j = 0; j <= M; ++j)
         {
             float s = float(j) / M;
-            float u = (2.0f * s - 1.0f);
-            u *= M_PI;
+            float u_ = (2.0f * s - 1.0f);
+            u_ *= M_PI;
+            Radians u = Radians(u_);
             points[INDEX(i, j)] = tor ? ST(u, v) : SE(u, v);
             norms[INDEX(i, j)] = SN(u, v);
             norm3(norms[INDEX(i, j)]);

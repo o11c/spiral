@@ -57,15 +57,15 @@ Drawing *root_object = nullptr;
 Super *the_super = nullptr;
 
 float rho;
-float theta, phi;
+Radians theta, phi;
 int sx, sy;
 
 static
 void reset()
 {
     rho = 5;
-    theta = 45 * M_PI/180;
-    phi = 45 * M_PI/180;
+    theta = Degrees(45);
+    phi = Degrees(45);
     the_super->tor = false;
     the_super->a = true;
     the_super->d = 1.5f;
@@ -83,11 +83,11 @@ void drag(int x, int y)
     if (x == sx and y == sy)
         return;
     // one degree per pixel should be manageable
-    theta -= (x - sx) * M_PI / 180;
-    phi -= (y - sy) * M_PI / 180;
-    float epsilon = std::numeric_limits<float>::epsilon() * M_PI;
+    theta -= Degrees(x - sx);
+    phi -= Degrees(y - sy);
+    Radians epsilon = Radians(std::numeric_limits<float>::epsilon() * M_PI);
     if (phi < epsilon) phi = epsilon;
-    if (phi > M_PI - epsilon) phi = M_PI - epsilon;
+    if (phi > Radians(M_PI) - epsilon) phi = Radians(M_PI) - epsilon;
     glutPostRedisplay();
     sx = x;
     sy = y;
@@ -130,7 +130,7 @@ void display()
     printf("    mesh_rings: %s\n", noyes[the_super->mesh_rings]);
     printf("    mesh_longs: %s\n", noyes[the_super->mesh_longs]);
     printf("    shade: %s\n", noyes[the_super->shade]);
-    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
+    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
     if (the_super->tor)
         printf("    (d) = (%f)\n", the_super->d);
     printf("    (n, m) = (%f, %f)\n", the_super->en, the_super->em);
@@ -142,12 +142,12 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     encv::ModelView = mat4();
     encv::ModelView.lookat(
-            rho * vec3(sinf(phi) * cosf(theta), sinf(phi) * sinf(theta), cosf(phi)),
+            rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi)),
             {0, 0, 0},
             {0, 0, 1});
     encv::Projection = mat4();
     // no matter what I do, this seems to break down when rho < about 150
-    encv::Projection.perspective(40, 1, rho / 50, rho * 2);
+    encv::Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
     encv::TextureMatrix = mat4();
     if (the_super->tor)
         encv::TextureMatrix.scale({1, 2, 1});
@@ -155,17 +155,18 @@ void display()
     {
         static int last_time = 0;
         static quat rot;
-        if (last_time == 0 || true)
+        if (last_time == 0)
         {
             last_time = glutGet(GLUT_ELAPSED_TIME);
-            float angle = last_time / 180.f * M_PI;
-            rot = quat(angle / 180.0f * M_PI, {0, 0, 1});
+            Degrees angle = Degrees(last_time / 50.0f);
+            rot = quat(angle, {0, 0, 1});
         }
         else
         {
             int this_time = glutGet(GLUT_ELAPSED_TIME);
-            float angle = (this_time - last_time) / 180.f * M_PI;
-            rot *= quat(angle / 180.0f * M_PI, {0, 0, 1});
+            Degrees angle = Degrees((this_time - last_time) / 50.0f);
+            last_time = this_time;
+            rot *= quat(angle, {0, 0, 1});
             rot.norm();
         }
         encv::View = encv::ModelView;

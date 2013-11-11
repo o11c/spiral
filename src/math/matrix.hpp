@@ -3,6 +3,7 @@
 
 #include <cstddef>
 
+#include "angle.hpp"
 #include "vector.hpp"
 
 class mat2
@@ -51,7 +52,7 @@ public:
     void operator *= (const mat4& A);
     void scale(const vec3& s);
     void translate(const vec3& d);
-    void rotate(float angle_degrees, vec3 axis);
+    void rotate(Degrees angle_degrees, vec3 axis);
 
     mat3 get_normal() const;
 
@@ -62,7 +63,7 @@ public:
             float bottom, float top,
             float hither, float yon);
     void perspective(
-            float fovy_degrees, float aspect,
+            Degrees fovy_degrees, float aspect,
             float zNear, float zFar);
 
     void reflect(const vec4& plane);

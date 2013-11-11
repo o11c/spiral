@@ -23,38 +23,38 @@ Spine::~Spine()
     glDeleteBuffers(6, &spine_points);
 }
 
-vec3 Spine::C(float t)
+vec3 Spine::C(Radians t)
 {
-    float x = (a + b * cosf(q * t)) * cosf(p * t);
-    float y = (a + b * cosf(q * t)) * sinf(p * t);
-    float z = b * sinf(q * t);
+    float x = (a + b * cos_(q * t)) * cos_(p * t);
+    float y = (a + b * cos_(q * t)) * sin_(p * t);
+    float z = b * sin_(q * t);
     return {x, y, z};
 }
-vec3 Spine::T(float t)
+vec3 Spine::T(Radians t)
 {
     // in CSE we trust
     vec3 c = C(t);
-    float dx = -p * c.y - b * q * sinf(q * t) * cosf(p * t);
-    float dy = p * c.x - b * q * sinf(q * t) * sinf(p * t);
-    float dz = b * q * cosf(q * t);
+    float dx = -p * c.y - b * q * sin_(q * t) * cos_(p * t);
+    float dy = p * c.x - b * q * sin_(q * t) * sin_(p * t);
+    float dz = b * q * cos_(q * t);
     return {dx, dy, dz};
 }
 
-vec3 Spine::A(float t)
+vec3 Spine::A(Radians t)
 {
     vec3 d = T(t);
-    float ax = -p * d.y + b * q * (p * sinf(q * t) * sinf(p * t) - q * cosf(q * t) * cosf(p * t));
-    float ay = p * d.x - b * q * (p * sinf(q * t) * cosf(p * t) + q * cosf(q * t) * sinf(p * t));
-    float az = -b * q * q * sinf(q * t);
+    float ax = -p * d.y + b * q * (p * sin_(q * t) * sin_(p * t) - q * cos_(q * t) * cos_(p * t));
+    float ay = p * d.x - b * q * (p * sin_(q * t) * cos_(p * t) + q * cos_(q * t) * sin_(p * t));
+    float az = -b * q * q * sin_(q * t);
     return {ax, ay, az};
 }
 
-vec3 Spine::B(float t)
+vec3 Spine::B(Radians t)
 {
     return cross(T(t), A(t));
 }
 
-vec3 Spine::N(float t)
+vec3 Spine::N(Radians t)
 {
     return cross(B(t), T(t));
 }
@@ -80,8 +80,9 @@ void Spine::update_spine()
     vec4 params[N];
     for (int i = 0; i < N; ++i)
     {
-        float t = 2 * M_PI * i / N;
-        params[i] = {float(i) / N, 0, 0, 1};
+        Turns t_(i, N);
+        Radians t = t_;
+        params[i] = {t_.value(), 0, 0, 1};
         points[i] = C(t);
     }
     glBindBuffer(GL_ARRAY_BUFFER, spine_points);
@@ -134,7 +135,8 @@ void Spine::update_mesh()
     sv2 quad_indices[N * (M + 1)];
     for (int i = 0; i <= N; ++i)
     {
-        float t = 2 * M_PI * i / N;
+        Turns t_(i, N);
+        Radians t = t_;
         vec3 Ct = C(t);
         vec3 Bt = B(t);
         norm3(Bt);
@@ -142,11 +144,12 @@ void Spine::update_mesh()
         norm3(Nt);
         for (int j = 0; j <= M; ++j)
         {
-            float u = 2 * M_PI * j / M;
-            params[i * (M + 1) + j] = {float(i) / N, float(j) / M, 0, 1};
-            norms[i * (M + 1) + j] = s * cosf(u) * Bt + r * sinf(u) * Nt;
+            Turns u_(j, M);
+            Radians u = u_;
+            params[i * (M + 1) + j] = {t_.value(), u_.value(), 0, 1};
+            norms[i * (M + 1) + j] = s * cos_(u) * Bt + r * sin_(u) * Nt;
             norm3(norms[i * (M + 1) + j]);
-            points[i * (M + 1) + j] = Ct + r * cosf(u) * Bt + s * sinf(u) * Nt;
+            points[i * (M + 1) + j] = Ct + r * cos_(u) * Bt + s * sin_(u) * Nt;
             if (i == N)
                 continue;
             quad_indices[i * (M + 1) + j] = {

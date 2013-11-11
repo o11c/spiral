@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "angle.hpp"
+
 // Based on matrix.c by Wayne Cochran, as bundled with the glyphs project.
 
 mat2::mat2() : data{
@@ -151,12 +153,12 @@ void mat4::ortho(
 }
 
 void mat4::perspective(
-        float fovy_degrees,
+        Degrees fovy_degrees,
         float aspect,
         float zNear, float zFar)
 {
-    const float fovy = fovy_degrees*(M_PI/180);
-    const float f = 1/tanf(fovy/2);
+    const Radians fovy = fovy_degrees;
+    const float f = 1/tan_(fovy/2);
     const float s = 1/(zNear - zFar);
     mat4 P;
     matrixSet4x4(P,
@@ -189,16 +191,16 @@ void mat4::translate(const vec3& d)
     *this *= S;
 }
 
-void mat4::rotate(float angle_degrees, vec3 axis)
+void mat4::rotate(Degrees angle_degrees, vec3 axis)
 {
     norm3(axis);
     const float x = axis.x;
     const float y = axis.y;
     const float z = axis.z;
 
-    const float angle = angle_degrees * (M_PI / 180);
-    const float c = cosf(angle);
-    const float s = sinf(angle);
+    const Radians angle = angle_degrees;
+    const float c = cos_(angle);
+    const float s = sin_(angle);
     const float c_ = 1 - c;
     const float zc_ = z * c_;
     const float yc_ = y * c_;

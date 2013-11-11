@@ -27,11 +27,11 @@ public:
     Spine(FlatProgram *fp, ShadeProgram *sp);
     ~Spine();
 
-    vec3 C(float t);
-    vec3 T(float t);
-    vec3 A(float t);
-    vec3 B(float t);
-    vec3 N(float t);
+    vec3 C(Radians t);
+    vec3 T(Radians t);
+    vec3 A(Radians t);
+    vec3 B(Radians t);
+    vec3 N(Radians t);
 
     void draw() override;
 private:

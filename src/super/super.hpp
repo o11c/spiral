@@ -28,9 +28,9 @@ public:
     Super(FlatProgram *fp, ShadeProgram *sp, TextureProgram *tp);
     ~Super();
 
-    vec3 SE(float u, float v);
-    vec3 ST(float u, float v);
-    vec3 SN(float u, float v);
+    vec3 SE(Radians u, Radians v);
+    vec3 ST(Radians u, Radians v);
+    vec3 SN(Radians u, Radians v);
 
     void draw() override;
 private:

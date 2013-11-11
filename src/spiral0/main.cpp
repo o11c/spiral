@@ -8,6 +8,7 @@
 
 #include <limits>
 
+#include "../math/angle.hpp"
 #include "spine.hpp"
 #include "../state.hpp"
 
@@ -53,15 +54,15 @@ Drawing *root_object = nullptr;
 Spine *the_spine = nullptr;
 
 float rho;
-float theta, phi;
+Radians theta, phi;
 int sx, sy;
 
 static
 void reset()
 {
     rho = 500;
-    theta = 45 * M_PI/180;
-    phi = 45 * M_PI/180;
+    theta = Degrees(45);
+    phi = Degrees(45);
     the_spine->a = 100;
     the_spine->b = 40;
     the_spine->r = 10;
@@ -80,11 +81,11 @@ void drag(int x, int y)
     if (x == sx and y == sy)
         return;
     // one degree per pixel should be manageable
-    theta -= (x - sx) * M_PI / 180;
-    phi -= (y - sy) * M_PI / 180;
-    float epsilon = std::numeric_limits<float>::epsilon() * M_PI;
+    theta -= Degrees(x - sx);
+    phi -= Degrees(y - sy);
+    Radians epsilon = Radians(std::numeric_limits<float>::epsilon() * M_PI);
     if (phi < epsilon) phi = epsilon;
-    if (phi > M_PI - epsilon) phi = M_PI - epsilon;
+    if (phi > Radians(M_PI) - epsilon) phi = Radians(M_PI) - epsilon;
     glutPostRedisplay();
     sx = x;
     sy = y;
@@ -127,7 +128,7 @@ void display()
     printf("    mesh_rings: %s\n", noyes[the_spine->mesh_rings]);
     printf("    mesh_longs: %s\n", noyes[the_spine->mesh_longs]);
     printf("    shade: %s\n", noyes[the_spine->shade]);
-    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta, phi);
+    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
     printf("    (a, b, r, s) = (%f, %f, %f, %f)\n", the_spine->a, the_spine->b, the_spine->r, the_spine->s);
     printf("    (p, q) = (%d, %d)\n", the_spine->p, the_spine->q);
     printf("    (n, m) = (%d, %d)\n", the_spine->n, the_spine->m);
@@ -139,15 +140,15 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     encv::ModelView = mat4();
     encv::ModelView.lookat(
-            rho * vec3(sinf(phi) * cosf(theta), sinf(phi) * sinf(theta), cosf(phi)),
+            rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi)),
             {0, 0, 0},
             {0, 0, 1});
     encv::Projection = mat4();
     // no matter what I do, this seems to break down when rho < about 150
-    encv::Projection.perspective(40, 1, rho / 50, rho * 2);
+    encv::Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
     if (root_object)
     {
-        float angle = glutGet(GLUT_ELAPSED_TIME) / 180.0f * M_PI;
+        Degrees angle = Degrees(glutGet(GLUT_ELAPSED_TIME) / 50.0f);
         encv::View = encv::ModelView;
         SavingMatrix sav(encv::ModelView);
         encv::ModelView.rotate(angle, {0, 0, 1});

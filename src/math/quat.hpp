@@ -1,6 +1,8 @@
 #ifndef QUAT_HPP
 #define QUAT_HPP
 
+#include "angle.hpp"
+
 class vec3;
 class mat4;
 
@@ -17,7 +19,7 @@ public:
     operator mat4() const;
 public:
     quat() = default;
-    quat(float angle, vec3 axis);
+    quat(Radians angle, vec3 axis);
 
     void norm();
 };
