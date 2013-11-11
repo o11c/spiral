@@ -47,7 +47,11 @@ obj/%.o: src/%.cpp
 
 include ${DEPENDS}
 
-bin/%: obj/%/main.o ${NORM_OBJECTS}
+obj/most.a: ${NORM_OBJECTS}
+	rm -f $@
+	ar rcs $@ $^
+
+bin/%: obj/%/main.o obj/most.a
 	$(MKDIR_FIRST)
 	${CXX} ${LDFLAGS} $^ ${LDLIBS} -o $@
 
