@@ -10,6 +10,7 @@
 
 #include "../bmp.hpp"
 #include "../glue/error.hpp"
+#include "../math/quat.hpp"
 #include "super.hpp"
 #include "../state.hpp"
 #include "../glue/texture.hpp"
@@ -152,10 +153,24 @@ void display()
         encv::TextureMatrix.scale({1, 2, 1});
     if (root_object)
     {
-        float angle = glutGet(GLUT_ELAPSED_TIME) / 180.0f * M_PI;
+        static int last_time = 0;
+        static quat rot;
+        if (last_time == 0 || true)
+        {
+            last_time = glutGet(GLUT_ELAPSED_TIME);
+            float angle = last_time / 180.f * M_PI;
+            rot = quat(angle / 180.0f * M_PI, {0, 0, 1});
+        }
+        else
+        {
+            int this_time = glutGet(GLUT_ELAPSED_TIME);
+            float angle = (this_time - last_time) / 180.f * M_PI;
+            rot *= quat(angle / 180.0f * M_PI, {0, 0, 1});
+            rot.norm();
+        }
         encv::View = encv::ModelView;
         SavingMatrix sav(encv::ModelView);
-        encv::ModelView.rotate(angle, {0, 0, 1});
+        encv::ModelView *= rot;
         root_object->draw();
     }
     glutSwapBuffers();
