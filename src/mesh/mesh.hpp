@@ -6,41 +6,38 @@
 #include "../drawing.hpp"
 #include "../shaders/flat-program.hpp"
 #include "../shaders/shade-program.hpp"
+#include "../shaders/texture-program.hpp"
 
-class Spine : public Drawing
+class Mesh : public Drawing
 {
     FlatProgram *flat_program;
     ShadeProgram *shade_program;
+    TextureProgram *texture_program;
 public:
-    float a, b, r, s;
-    int p, q;
-    int n, m;
-    bool spine;
-    bool mesh_rings, mesh_longs;
-    bool shade;
+    float d; bool tor; bool a;
+    float em, en;
+    int dm, dn;
 
-    bool dirty_spine, dirty_mesh;
+    bool mesh_rings, mesh_longs;
+    bool shade, texture;
+
+    bool dirty_mesh;
 private:
-    unsigned int spine_points, spine_params;
     unsigned int mesh_points, mesh_norms, mesh_params, mesh_indices;
 public:
-    Spine(FlatProgram *fp, ShadeProgram *sp);
-    ~Spine();
+    Mesh(FlatProgram *fp, ShadeProgram *sp, TextureProgram *tp);
+    ~Mesh();
 
-    vec3 C(Radians t);
-    vec3 T(Radians t);
-    vec3 A(Radians t);
-    vec3 B(Radians t);
-    vec3 N(Radians t);
+    vec3 SE(Radians u, Radians v);
+    vec3 ST(Radians u, Radians v);
+    vec3 SN(Radians u, Radians v);
 
     void draw() override;
 private:
-    void update_spine();
     void update_mesh();
 
-    void draw_spine();
     void draw_mesh();
     void draw_shade();
 };
 
-#endif //SPINE_HPP
+#endif

@@ -1,5 +1,5 @@
-#ifndef SPINE_HPP
-#define SPINE_HPP
+#ifndef SUPER_HPP
+#define SUPER_HPP
 
 #include "../../config.h"
 
@@ -40,4 +40,4 @@ private:
     void draw_shade();
 };
 
-#endif
+#endif //SUPER_HPP
