@@ -1,20 +1,73 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-struct ivec2
+class ivec2
 {
-    __attribute__((error("NYI")))
-    const int *ptr() const;
+public:
+    union
+    {
+        int data[2];
+        struct { int x, y; };
+        struct { int r, g; };
+        struct { int s, t; };
+    };
+
+public:
+    ivec2() = default;
+    constexpr
+    ivec2(int x, int y) : data{x, y} {}
+
+    int *ptr() { return data; }
+    const int *ptr() const { return data; }
 };
-struct ivec3
+
+class ivec3
 {
-    __attribute__((error("NYI")))
-    const int *ptr() const;
+public:
+    union
+    {
+        int data[3];
+        struct { int x, y, z; };
+        struct { int r, g, b; };
+        struct { int s, t, p; };
+
+        // swizzle
+        ivec2 xy;
+    };
+
+public:
+    ivec3() = default;
+    constexpr
+    ivec3(int x, int y, int z) : data{x, y, z} {}
+
+    int *ptr() { return data; }
+    const int *ptr() const { return data; }
 };
-struct ivec4
+
+class ivec4
 {
-    __attribute__((error("NYI")))
-    const int *ptr() const;
+public:
+    union
+    {
+        int data[4];
+        struct { int x, y, z, w; };
+        struct { int r, g, b, a; };
+        struct { int s, t, p, q; };
+
+        // swizzle
+        ivec3 xyz;
+        ivec2 xy;
+    };
+
+public:
+    ivec4() = default;
+    constexpr
+    ivec4(int x, int y, int z, int w) : data{x, y, z, w} {}
+    constexpr
+    ivec4(const ivec3& v, int w) : data{v.x, v.y, v.z, w} {}
+
+    int *ptr() { return data; }
+    const int *ptr() const { return data; }
 };
 
 class vec2
