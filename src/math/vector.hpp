@@ -20,25 +20,14 @@ struct ivec4
 class vec2
 {
 public:
-    constexpr float x() const { return data[0]; }
-    constexpr float y() const { return data[1]; }
+    union
+    {
+        float data[2];
+        struct { float x, y; };
+        struct { float r, g; };
+        struct { float s, t; };
+    };
 
-    constexpr float r() const { return data[0]; }
-    constexpr float g() const { return data[1]; }
-
-    constexpr float s() const { return data[0]; }
-    constexpr float t() const { return data[1]; }
-
-    void x(float v) { data[0] = v; }
-    void y(float v) { data[1] = v; }
-
-    void r(float v) { data[0] = v; }
-    void g(float v) { data[1] = v; }
-
-    void s(float v) { data[0] = v; }
-    void t(float v) { data[1] = v; }
-private:
-    float data[2];
 public:
     vec2() = default;
     constexpr
@@ -52,31 +41,17 @@ public:
 class vec3
 {
 public:
-    constexpr float x() const { return data[0]; }
-    constexpr float y() const { return data[1]; }
-    constexpr float z() const { return data[2]; }
+    union
+    {
+        float data[3];
+        struct { float x, y, z; };
+        struct { float r, g, b; };
+        struct { float s, t, p; };
 
-    constexpr float r() const { return data[0]; }
-    constexpr float g() const { return data[1]; }
-    constexpr float b() const { return data[2]; }
+        // swizzle
+        vec2 xy;
+    };
 
-    constexpr float s() const { return data[0]; }
-    constexpr float t() const { return data[1]; }
-    constexpr float p() const { return data[2]; }
-
-    void x(float v) { data[0] = v; }
-    void y(float v) { data[1] = v; }
-    void z(float v) { data[2] = v; }
-
-    void r(float v) { data[0] = v; }
-    void g(float v) { data[1] = v; }
-    void b(float v) { data[2] = v; }
-
-    void s(float v) { data[0] = v; }
-    void t(float v) { data[1] = v; }
-    void p(float v) { data[2] = v; }
-private:
-    float data[3];
 public:
     vec3() = default;
     constexpr
@@ -90,45 +65,24 @@ public:
 class vec4
 {
 public:
-    constexpr float x() const { return data[0]; }
-    constexpr float y() const { return data[1]; }
-    constexpr float z() const { return data[2]; }
-    constexpr float w() const { return data[3]; }
+    union
+    {
+        float data[4];
+        struct { float x, y, z, w; };
+        struct { float r, g, b, a; };
+        struct { float s, t, p, q; };
 
-    constexpr float r() const { return data[0]; }
-    constexpr float g() const { return data[1]; }
-    constexpr float b() const { return data[2]; }
-    constexpr float a() const { return data[3]; }
+        // swizzle
+        vec3 xyz;
+        vec2 xy;
+    };
 
-    constexpr float s() const { return data[0]; }
-    constexpr float t() const { return data[1]; }
-    constexpr float p() const { return data[2]; }
-    constexpr float q() const { return data[3]; }
-
-    void x(float v) { data[0] = v; }
-    void y(float v) { data[1] = v; }
-    void z(float v) { data[2] = v; }
-    void w(float v) { data[3] = v; }
-
-    void r(float v) { data[0] = v; }
-    void g(float v) { data[1] = v; }
-    void b(float v) { data[2] = v; }
-    void a(float v) { data[3] = v; }
-
-    void s(float v) { data[0] = v; }
-    void t(float v) { data[1] = v; }
-    void p(float v) { data[2] = v; }
-    void q(float v) { data[3] = v; }
-
-    constexpr vec3 xyz() const { return {x(), y(), z()}; }
-private:
-    float data[4];
 public:
     vec4() = default;
     constexpr
     vec4(float x, float y, float z, float w) : data{x, y, z, w} {}
     constexpr
-    vec4(const vec3& v, float w) : data{v.x(), v.y(), v.z(), w} {}
+    vec4(const vec3& v, float w) : data{v.x, v.y, v.z, w} {}
 
     float *ptr() { return data; }
     const float *ptr() const { return data; }

@@ -4,22 +4,22 @@
 
 vec3 operator + (const vec3& l, const vec3& r)
 {
-    return {l.x() + r.x(), l.y() + r.y(), l.z() + r.z()};
+    return {l.x + r.x, l.y + r.y, l.z + r.z};
 }
 vec3 operator - (const vec3& l, const vec3& r)
 {
-    return {l.x() - r.x(), l.y() - r.y(), l.z() - r.z()};
+    return {l.x - r.x, l.y - r.y, l.z - r.z};
 }
 vec3 operator -(const vec3& l)
 {
-    return {-l.x(), -l.y(), -l.z()};
+    return {-l.x, -l.y, -l.z};
 }
 
 vec3& operator *= (vec3& V, float s)
 {
-    V.x(V.x() * s);
-    V.y(V.y() * s);
-    V.z(V.z() * s);
+    V.x *= s;
+    V.y *= s;
+    V.z *= s;
     return V;
 }
 vec3 operator * (vec3 v, float s)
@@ -35,11 +35,11 @@ vec3 operator * (float s, vec3 v)
 
 float dot(const vec3& l, const vec3& r)
 {
-    return l.x() * r.x() + l.y() * r.y() + l.z() * r.z();
+    return l.x * r.x + l.y * r.y + l.z * r.z;
 }
 float dot(const vec4& l, const vec4& r)
 {
-    return l.x() * r.x() + l.y() * r.y() + l.z() * r.z() + l.w() * r.w();
+    return l.x * r.x + l.y * r.y + l.z * r.z + l.w * r.w;
 }
 
 void norm3(vec3& V)
@@ -51,9 +51,9 @@ void norm3(vec3& V)
 vec3 cross(const vec3& U, const vec3& V)
 {
     return {
-        U.y() * V.z() - U.z() * V.y(),
-        U.z() * V.x() - U.x() * V.z(),
-        U.x() * V.y() - U.y() * V.x(),
+        U.y * V.z - U.z * V.y,
+        U.z * V.x - U.x * V.z,
+        U.x * V.y - U.y * V.x,
     };
 }
 

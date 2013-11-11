@@ -34,8 +34,8 @@ vec3 Spine::T(float t)
 {
     // in CSE we trust
     vec3 c = C(t);
-    float dx = -p * c.y() - b * q * sinf(q * t) * cosf(p * t);
-    float dy = p * c.x() - b * q * sinf(q * t) * sinf(p * t);
+    float dx = -p * c.y - b * q * sinf(q * t) * cosf(p * t);
+    float dy = p * c.x - b * q * sinf(q * t) * sinf(p * t);
     float dz = b * q * cosf(q * t);
     return {dx, dy, dz};
 }
@@ -43,8 +43,8 @@ vec3 Spine::T(float t)
 vec3 Spine::A(float t)
 {
     vec3 d = T(t);
-    float ax = -p * d.y() + b * q * (p * sinf(q * t) * sinf(p * t) - q * cosf(q * t) * cosf(p * t));
-    float ay = p * d.x() - b * q * (p * sinf(q * t) * cosf(p * t) + q * cosf(q * t) * sinf(p * t));
+    float ax = -p * d.y + b * q * (p * sinf(q * t) * sinf(p * t) - q * cosf(q * t) * cosf(p * t));
+    float ay = p * d.x - b * q * (p * sinf(q * t) * cosf(p * t) + q * cosf(q * t) * sinf(p * t));
     float az = -b * q * q * sinf(q * t);
     return {ax, ay, az};
 }

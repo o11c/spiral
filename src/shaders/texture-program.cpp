@@ -59,7 +59,7 @@ void TextureProgram::load()
     auto& specular_textureValue = *encv::specular_texture;
     float materialShininessValue = /*int*/encv::materialShininess;
     auto& ambientLightValue = encv::ambientLight;
-    vec3 lightPositionValue = (encv::View * vec4(encv::lightPosition, 1.0)).xyz();
+    vec3 lightPositionValue = (encv::View * vec4(encv::lightPosition, 1.0)).xyz;
     auto& lightColorValue = encv::lightColor;
 
     glUseProgram(program);
