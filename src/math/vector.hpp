@@ -1,6 +1,10 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#if __GNUC__ == 4 && (__GNUC_MINOR__ == 6 || __GNUC_MINOR__ == 7)
+#define constexpr
+#endif
+
 class ivec2
 {
 public:
@@ -154,5 +158,9 @@ float dot(const vec4& l, const vec4& r);
 void norm3(vec3& V);
 vec3 cross(const vec3& U, const vec3& V);
 float mag(const vec3& v);
+
+#ifdef constexpr
+#undef constexpr
+#endif
 
 #endif // VECTOR_HPP

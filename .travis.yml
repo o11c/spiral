@@ -56,6 +56,11 @@ env:
   - ignore=this
 
 matrix:
+  allow_failures:
+    - compiler: gcc
+      env: REAL_CC=gcc-4.6   REAL_CXX=g++-4.6     PPA=                            PACKAGE=g++-4.6
+    - compiler: gcc
+      env: REAL_CC=gcc-4.7   REAL_CXX=g++-4.7     PPA=ppa:ubuntu-toolchain-r/test PACKAGE=g++-4.7
   exclude:
     - env: ignore=this
   include:
