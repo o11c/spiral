@@ -217,8 +217,9 @@ int main(int argc, char **argv)
     TextureVertexShader tvs;
     TextureFragmentShader tfs;
     TextureProgram tp(&tvs, &tfs);
-#define MESH_FILE "data/spiral-1.0000000000e+02,4.0000000000e+01,1.0000000000e+01,1.0000000000e+01-2,5,100,10.mesh"
-    Mesh mesh(&tp, silly_parse(std::ifstream("data/super-0.0000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh")));
+//#define MESH_FILE "data/spiral-1.0000000000e+02,4.0000000000e+01,1.0000000000e+01,1.0000000000e+01-2,5,100,10.mesh"
+#define MESH_FILE "data/super-0.0000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh"
+    Mesh mesh(&tp, silly_parse(std::ifstream(MESH_FILE)));
     root_object = &mesh;
     the_mesh = &mesh;
 

@@ -25,9 +25,6 @@ struct YamlVertex
 struct YamlFace
 {
     ivec3 vertices;
-    std::string ambient;
-    std::string diffuse;
-    std::string specular;
 };
 
 struct YamlMesh

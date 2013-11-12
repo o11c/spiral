@@ -103,6 +103,15 @@ YamlMesh silly_parse(std::istream& in)
         }
         else
         {
+            if (mode == Mode::FACES)
+            {
+                if (line.find(':') != std::string::npos)
+                    fail("unexpect submap");
+                if (out.vertices.empty())
+                    fail("expect list");
+                out.faces.back().vertices = parse_ivec3(line);
+                continue;
+            }
             size_t colon = line.find(':');
             if (colon == std::string::npos)
                 fail("expect submap");
@@ -126,20 +135,6 @@ YamlMesh silly_parse(std::istream& in)
                     out.vertices.back().texture = parse_vec4(value);
                 else if (key == "normal")
                     out.vertices.back().normal = parse_vec4(value);
-                else
-                    fail("bad subkey");
-                break;
-            case Mode::FACES:
-                if (out.vertices.empty())
-                    fail("expect list");
-                if (key == "vertices")
-                    out.faces.back().vertices = parse_ivec3(value);
-                else if (key == "ambient")
-                    out.faces.back().ambient = value;
-                else if (key == "diffuse")
-                    out.faces.back().diffuse = value;
-                else if (key == "specular")
-                    out.faces.back().specular = value;
                 else
                     fail("bad subkey");
                 break;

@@ -192,9 +192,9 @@ void Super::update_mesh()
             dm, dn);
     FILE *fp = fopen(filename, "w");
     fprintf(fp, "textures:\n");
-    fprintf(fp, "  day: data/earthmap1k.bmp\n");
-    fprintf(fp, "  night: data/earthlights1k.bmp\n");
-    fprintf(fp, "  shiny: data/earthspec1k.bmp\n");
+    fprintf(fp, "  ambient: data/earthlights1k.bmp\n");
+    fprintf(fp, "  diffuse: data/earthmap1k.bmp\n");
+    fprintf(fp, "  specular: data/earthspec1k.bmp\n");
 
     fprintf(fp, "\nvertices:\n");
     for (int i = 0; i < (N + 1) * (M + 1); ++i)
@@ -222,14 +222,8 @@ void Super::update_mesh()
             quad_indices[j].b,
             quad_indices[j].a,
         };
-        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f1.x, f1.y, f1.z);
-        fprintf(fp, "    ambient: night\n");
-        fprintf(fp, "    diffuse: day\n");
-        fprintf(fp, "    specular: shiny\n");
-        fprintf(fp, "  - vertices: [%d, %d, %d]\n", f2.x, f2.y, f2.z);
-        fprintf(fp, "    ambient: night\n");
-        fprintf(fp, "    diffuse: day\n");
-        fprintf(fp, "    specular: shiny\n");
+        fprintf(fp, "  - [%d, %d, %d]\n", f1.x, f1.y, f1.z);
+        fprintf(fp, "  - [%d, %d, %d]\n", f2.x, f2.y, f2.z);
     }
     fclose(fp);
 
