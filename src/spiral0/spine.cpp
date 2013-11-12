@@ -192,8 +192,8 @@ void Spine::update_mesh()
         ivec3 f2 =
         {
             quad_indices[j - 1].b,
-            quad_indices[j].a,
             quad_indices[j].b,
+            quad_indices[j].a,
         };
         fprintf(fp, "  - vertices: [%d, %d, %d]\n", f1.x, f1.y, f1.z);
         fprintf(fp, "    ambient: night\n");

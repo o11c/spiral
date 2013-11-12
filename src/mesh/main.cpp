@@ -6,9 +6,11 @@
 #include <cmath>
 #include <cstdio>
 
+#include <fstream>
 #include <limits>
 
 #include "../bmp.hpp"
+#include "../yaml/dumb.hpp"
 #include "../glue/error.hpp"
 #include "../math/quat.hpp"
 #include "mesh.hpp"
@@ -46,12 +48,6 @@ void dec(int low, int& i)
         i--;
 }
 
-static
-void toggle(bool& b)
-{
-    b = not b;
-}
-
 
 Drawing *root_object = nullptr;
 Mesh *the_mesh = nullptr;
@@ -66,15 +62,6 @@ void reset()
     rho = 5;
     theta = Degrees(45);
     phi = Degrees(45);
-    the_mesh->tor = false;
-    the_mesh->a = true;
-    the_mesh->d = 1.5f;
-    the_mesh->em = 4;
-    the_mesh->en = 4;
-    the_mesh->dn = 32;
-    the_mesh->dm = 32;
-
-    the_mesh->mesh_rings = the_mesh->mesh_longs;
 }
 
 static
@@ -125,17 +112,8 @@ static
 void display()
 {
     checkOpenGLError();
-    const char *noyes[2] = {"no", "yes"};
     printf("Drawing:\n");
-    printf("    mesh_rings: %s\n", noyes[the_mesh->mesh_rings]);
-    printf("    mesh_longs: %s\n", noyes[the_mesh->mesh_longs]);
-    printf("    shade: %s\n", noyes[the_mesh->shade]);
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
-    if (the_mesh->tor)
-        printf("    (d) = (%f)\n", the_mesh->d);
-    printf("    (n, m) = (%f, %f)\n", the_mesh->en, the_mesh->em);
-    printf("    (N, M) = (%d, %d)\n", the_mesh->dn, the_mesh->dm);
-    printf("    dirty mesh: %s\n", noyes[the_mesh->dirty_mesh]);
     printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
 
@@ -149,8 +127,6 @@ void display()
     // no matter what I do, this seems to break down when rho < about 150
     encv::Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
     encv::TextureMatrix = mat4();
-    if (the_mesh->tor)
-        encv::TextureMatrix.scale({1, 2, 1});
     if (root_object)
     {
         static int last_time = 0;
@@ -205,44 +181,11 @@ void keyboard(unsigned char key, int, int)
     case '0':
         reset();
         break;
-    case '2':
-        toggle(the_mesh->mesh_rings);
-        toggle(the_mesh->mesh_longs);
-        break;
-    case '3':
-        toggle(the_mesh->shade);
-        break;
-    case '4':
-        toggle(the_mesh->texture);
-        break;
-    case '8':
-        toggle(the_mesh->mesh_rings);
-        break;
-    case '9':
-        toggle(the_mesh->mesh_longs);
-        break;
-    case 't':
-        toggle(the_mesh->tor);
-        break;
-    case 'a':
-        toggle(the_mesh->a);
-        break;
     case 'e': dec(1, encv::materialShininess); break;
     case 'E': inc(encv::materialShininess, 50); break;
-    case 'd': dec(0.1f, the_mesh->d); break;
-    case 'D': inc(the_mesh->d, 10.f); break;
-    case 'p': dec(1, the_mesh->en); break;
-    case 'P': inc(the_mesh->en, 100); break;
-    case 'q': dec(1, the_mesh->em); break;
-    case 'Q': inc(the_mesh->em, 100); break;
-    case 'n': dec(3, the_mesh->dn); break;
-    case 'N': inc(the_mesh->dn, 100); break;
-    case 'm': dec(3, the_mesh->dm); break;
-    case 'M': inc(the_mesh->dm, 100); break;
     default:
         return;
     }
-    the_mesh->dirty_mesh = true;
     glutPostRedisplay();
 }
 
@@ -271,16 +214,11 @@ void init_glut(int argc, char **argv)
 int main(int argc, char **argv)
 {
     init_glut(argc, argv);
-    FlatVertexShader fvs;
-    ShadeVertexShader svs;
     TextureVertexShader tvs;
-    SimpleFragmentShader sfs;
-    BetterFragmentShader bfs;
     TextureFragmentShader tfs;
-    FlatProgram fp(&fvs, &sfs);
-    ShadeProgram sp(&svs, &bfs);
     TextureProgram tp(&tvs, &tfs);
-    Mesh mesh(&fp, &sp, &tp);
+#define MESH_FILE "data/spiral-1.0000000000e+02,4.0000000000e+01,1.0000000000e+01,1.0000000000e+01-2,5,100,10.mesh"
+    Mesh mesh(&tp, silly_parse(std::ifstream("data/super-0.0000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh")));
     root_object = &mesh;
     the_mesh = &mesh;
 

@@ -219,8 +219,8 @@ void Super::update_mesh()
         ivec3 f2 =
         {
             quad_indices[j - 1].b,
-            quad_indices[j].a,
             quad_indices[j].b,
+            quad_indices[j].a,
         };
         fprintf(fp, "  - vertices: [%d, %d, %d]\n", f1.x, f1.y, f1.z);
         fprintf(fp, "    ambient: night\n");
@@ -322,19 +322,40 @@ void Super::draw_shade()
 
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
-    glEnableVertexAttribArray(shade_program->vertexPositionAttribute);
-    glEnableVertexAttribArray(shade_program->vertexNormalAttribute);
-    glEnableVertexAttribArray(shade_program->paramAttribute);
+    if (texture)
+    {
+        glEnableVertexAttribArray(texture_program->vertexPositionAttribute);
+        glEnableVertexAttribArray(texture_program->vertexNormalAttribute);
+        glEnableVertexAttribArray(texture_program->paramAttribute);
+    }
+    else
+    {
+        glEnableVertexAttribArray(shade_program->vertexPositionAttribute);
+        glEnableVertexAttribArray(shade_program->vertexNormalAttribute);
+        glEnableVertexAttribArray(shade_program->paramAttribute);
+    }
     {
         glBindBuffer(GL_ARRAY_BUFFER, mesh_points);
-        glVertexAttribPointer(shade_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
-                0, (GLvoid*) 0);
+        if (texture)
+            glVertexAttribPointer(texture_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
+        else
+            glVertexAttribPointer(shade_program->vertexPositionAttribute, 3, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_norms);
-        glVertexAttribPointer(shade_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
-                0, (GLvoid*) 0);
+        if (texture)
+            glVertexAttribPointer(texture_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
+        else
+            glVertexAttribPointer(shade_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
         glBindBuffer(GL_ARRAY_BUFFER, mesh_params);
-        glVertexAttribPointer(shade_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
-                0, (GLvoid*) 0);
+        if (texture)
+            glVertexAttribPointer(texture_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
+        else
+            glVertexAttribPointer(shade_program->paramAttribute, 4, GL_FLOAT, GL_FALSE,
+                    0, (GLvoid*) 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_indices);
         //for (int i = 0; i < N; ++i)
         {
@@ -342,8 +363,17 @@ void Super::draw_shade()
                     (GLvoid *) 0);
         }
     }
-    glDisableVertexAttribArray(shade_program->vertexPositionAttribute);
-    glDisableVertexAttribArray(shade_program->vertexNormalAttribute);
-    glDisableVertexAttribArray(shade_program->paramAttribute);
+    if (texture)
+    {
+        glDisableVertexAttribArray(texture_program->vertexPositionAttribute);
+        glDisableVertexAttribArray(texture_program->vertexNormalAttribute);
+        glDisableVertexAttribArray(texture_program->paramAttribute);
+    }
+    else
+    {
+        glDisableVertexAttribArray(shade_program->vertexPositionAttribute);
+        glDisableVertexAttribArray(shade_program->vertexNormalAttribute);
+        glDisableVertexAttribArray(shade_program->paramAttribute);
+    }
     glDisable(GL_POLYGON_OFFSET_FILL);
 }

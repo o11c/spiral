@@ -130,6 +130,7 @@ void display()
     printf("    mesh_rings: %s\n", noyes[the_super->mesh_rings]);
     printf("    mesh_longs: %s\n", noyes[the_super->mesh_longs]);
     printf("    shade: %s\n", noyes[the_super->shade]);
+    printf("    texture: %s\n", noyes[the_super->texture]);
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
     if (the_super->tor)
         printf("    (d) = (%f)\n", the_super->d);

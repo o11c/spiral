@@ -38,5 +38,7 @@ struct YamlMesh
 };
 
 YamlMesh silly_parse(std::istream& in);
+inline
+YamlMesh silly_parse(std::istream&& in) { return silly_parse(in); }
 
 #endif //YAML_DUMB_HPP
