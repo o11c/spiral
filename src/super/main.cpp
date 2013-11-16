@@ -59,6 +59,7 @@ Super *the_super = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
+bool pause;
 
 static
 void reset()
@@ -155,13 +156,11 @@ void display()
     if (root_object)
     {
         static int last_time = 0;
-        static quat rot;
-        if (last_time == 0)
-        {
+        static quat rot = quat(Degrees(0), {0, 0, 1});
+        if (pause)
+            last_time = 0;
+        else if (last_time == 0)
             last_time = glutGet(GLUT_ELAPSED_TIME);
-            Degrees angle = Degrees(last_time / 50.0f);
-            rot = quat(angle, {0, 0, 1});
-        }
         else
         {
             int this_time = glutGet(GLUT_ELAPSED_TIME);
@@ -177,7 +176,8 @@ void display()
     }
     glutSwapBuffers();
     checkOpenGLError();
-    glutPostRedisplay();
+    if (!pause)
+        glutPostRedisplay();
 }
 
 static
@@ -203,6 +203,9 @@ void keyboard(unsigned char key, int, int)
     case '\e':
         glutLeaveMainLoop();
         return;
+    case ' ':
+        toggle(pause);
+        break;
     case '0':
         reset();
         break;

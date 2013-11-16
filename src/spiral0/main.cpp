@@ -9,6 +9,7 @@
 #include <limits>
 
 #include "../math/angle.hpp"
+#include "../math/quat.hpp"
 #include "spine.hpp"
 #include "../state.hpp"
 
@@ -56,6 +57,7 @@ Spine *the_spine = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
+bool pause;
 
 static
 void reset()
@@ -148,14 +150,28 @@ void display()
     encv::Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
     if (root_object)
     {
-        Degrees angle = Degrees(glutGet(GLUT_ELAPSED_TIME) / 50.0f);
+        static int last_time = 0;
+        static quat rot = quat(Degrees(0), {0, 0, 1});
+        if (pause)
+            last_time = 0;
+        else if (last_time == 0)
+            last_time = glutGet(GLUT_ELAPSED_TIME);
+        else
+        {
+            int this_time = glutGet(GLUT_ELAPSED_TIME);
+            Degrees angle = Degrees((this_time - last_time) / 50.0f);
+            last_time = this_time;
+            rot *= quat(angle, {0, 0, 1});
+            rot.norm();
+        }
         encv::View = encv::ModelView;
         SavingMatrix sav(encv::ModelView);
-        encv::ModelView.rotate(angle, {0, 0, 1});
+        encv::ModelView *= rot;
         root_object->draw();
     }
     glutSwapBuffers();
-    glutPostRedisplay();
+    if (!pause)
+        glutPostRedisplay();
 }
 
 static
@@ -181,6 +197,9 @@ void keyboard(unsigned char key, int, int)
     case '\e':
         glutLeaveMainLoop();
         return;
+    case ' ':
+        toggle(pause);
+        break;
     case '0':
         reset();
         break;

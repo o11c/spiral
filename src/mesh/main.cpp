@@ -48,6 +48,12 @@ void dec(int low, int& i)
         i--;
 }
 
+static
+void toggle(bool& b)
+{
+    b = not b;
+}
+
 
 Drawing *root_object = nullptr;
 Mesh *the_mesh = nullptr;
@@ -55,6 +61,7 @@ Mesh *the_mesh = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
+bool pause;
 
 static
 void reset()
@@ -130,13 +137,11 @@ void display()
     if (root_object)
     {
         static int last_time = 0;
-        static quat rot;
-        if (last_time == 0)
-        {
+        static quat rot = quat(Degrees(0), {0, 0, 1});
+        if (pause)
+            last_time = 0;
+        else if (last_time == 0)
             last_time = glutGet(GLUT_ELAPSED_TIME);
-            Degrees angle = Degrees(last_time / 50.0f);
-            rot = quat(angle, {0, 0, 1});
-        }
         else
         {
             int this_time = glutGet(GLUT_ELAPSED_TIME);
@@ -152,7 +157,8 @@ void display()
     }
     glutSwapBuffers();
     checkOpenGLError();
-    glutPostRedisplay();
+    if (!pause)
+        glutPostRedisplay();
 }
 
 static
@@ -178,6 +184,9 @@ void keyboard(unsigned char key, int, int)
     case '\e':
         glutLeaveMainLoop();
         return;
+    case ' ':
+        toggle(pause);
+        break;
     case '0':
         reset();
         break;
@@ -190,7 +199,7 @@ void keyboard(unsigned char key, int, int)
 }
 
 static
-void init_glut(int argc, char **argv)
+void init_glut(int& argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
@@ -214,12 +223,15 @@ void init_glut(int argc, char **argv)
 int main(int argc, char **argv)
 {
     init_glut(argc, argv);
+    if (argc != 2)
+    {
+        printf("Usage: %s <mesh-file>\n", argv[0]);
+        return 1;
+    }
     TextureVertexShader tvs;
     TextureFragmentShader tfs;
     TextureProgram tp(&tvs, &tfs);
-//#define MESH_FILE "data/spiral-1.0000000000e+02,4.0000000000e+01,1.0000000000e+01,1.0000000000e+01-2,5,100,10.mesh"
-#define MESH_FILE "data/super-0.0000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh"
-    Mesh mesh(&tp, silly_parse(std::ifstream(MESH_FILE)));
+    Mesh mesh(&tp, silly_parse(std::ifstream(argv[1])));
     root_object = &mesh;
     the_mesh = &mesh;
 
