@@ -59,7 +59,7 @@ Super *the_super = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
-bool pause;
+bool pause_;
 
 static
 void reset()
@@ -157,7 +157,7 @@ void display()
     {
         static int last_time = 0;
         static quat rot = quat(Degrees(0), {0, 0, 1});
-        if (pause)
+        if (pause_)
             last_time = 0;
         else if (last_time == 0)
             last_time = glutGet(GLUT_ELAPSED_TIME);
@@ -176,7 +176,7 @@ void display()
     }
     glutSwapBuffers();
     checkOpenGLError();
-    if (!pause)
+    if (!pause_)
         glutPostRedisplay();
 }
 
@@ -204,7 +204,7 @@ void keyboard(unsigned char key, int, int)
         glutLeaveMainLoop();
         return;
     case ' ':
-        toggle(pause);
+        toggle(pause_);
         break;
     case '0':
         reset();

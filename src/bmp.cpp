@@ -17,7 +17,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 /*
  * Read 32-bit integer from file stored little-endian style.

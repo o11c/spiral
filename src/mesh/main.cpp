@@ -62,7 +62,7 @@ Scene *root_scene = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
-bool pause;
+bool pause_;
 vec3 axis;
 
 static
@@ -133,7 +133,7 @@ void display()
     if (root_scene)
     {
         static int last_time = 0;
-        if (pause)
+        if (pause_)
             last_time = 0;
         else if (last_time == 0)
             last_time = glutGet(GLUT_ELAPSED_TIME);
@@ -164,7 +164,7 @@ void display()
     }
     glutSwapBuffers();
     checkOpenGLError();
-    if (!pause)
+    if (!pause_)
         glutPostRedisplay();
 }
 
@@ -192,7 +192,7 @@ void keyboard(unsigned char key, int, int)
         glutLeaveMainLoop();
         return;
     case ' ':
-        toggle(pause);
+        toggle(pause_);
         break;
     case '0':
         reset();

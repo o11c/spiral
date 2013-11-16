@@ -17,9 +17,11 @@ struct image
     int width, height;
 };
 
-struct sampler2D
+class sampler2D
 {
+public:
     unsigned int which, object;
+public:
     sampler2D(unsigned which, const image& img);
     ~sampler2D();
 };
