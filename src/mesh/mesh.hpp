@@ -3,20 +3,21 @@
 
 #include "../../config.h"
 
-#include "../drawing.hpp"
+#include "scene.hpp"
 #include "../yaml/dumb.hpp"
-#include "../shaders/texture-program.hpp"
+#include "../shaders/new-texture-program.hpp"
 
-class Mesh : public Drawing
+class Mesh : public Model
 {
-    TextureProgram *texture_program;
+    NewTextureProgram *texture_program;
     unsigned int mesh_points, mesh_norms, mesh_texture_coords, mesh_indices;
     unsigned int face_count;
+    std::unique_ptr<Material> material;
 public:
-    Mesh(TextureProgram *tp, YamlMesh ym);
+    Mesh(NewTextureProgram *tp, YamlMesh ym);
     ~Mesh();
 
-    void draw() override;
+    void draw(Context&) override;
 };
 
 #endif // MESH_HPP

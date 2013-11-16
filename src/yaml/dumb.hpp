@@ -30,6 +30,7 @@ struct YamlFace
 struct YamlMesh
 {
     std::map<std::string, YamlTexture> textures;
+    // TODO add shininess
     std::vector<YamlVertex> vertices;
     std::vector<YamlFace> faces;
 };

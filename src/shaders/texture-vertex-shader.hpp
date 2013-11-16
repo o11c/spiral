@@ -4,6 +4,7 @@
 class TextureVertexShader
 {
     friend class TextureProgram;
+    friend class NewTextureProgram;
     unsigned int shader;
 public:
     TextureVertexShader();

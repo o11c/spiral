@@ -4,6 +4,7 @@
 class TextureFragmentShader
 {
     friend class TextureProgram;
+    friend class NewTextureProgram;
     unsigned int shader;
 public:
     TextureFragmentShader();

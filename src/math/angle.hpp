@@ -20,7 +20,7 @@ public:
     Turns(Degrees d);
 
     constexpr
-    float value() { return _value; }
+    float value() const { return _value; }
 };
 
 class Radians
@@ -36,7 +36,7 @@ public:
     Radians(Degrees d);
 
     constexpr
-    float value() { return _value; }
+    float value() const { return _value; }
 };
 
 class Degrees
@@ -52,7 +52,7 @@ public:
     Degrees(Radians r);
 
     constexpr
-    float value() { return _value; }
+    float value() const { return _value; }
 };
 
 constexpr

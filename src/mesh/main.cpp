@@ -12,9 +12,9 @@
 #include "../bmp.hpp"
 #include "../yaml/dumb.hpp"
 #include "../glue/error.hpp"
+#include "../lieu/mem.hpp"
 #include "../math/quat.hpp"
 #include "mesh.hpp"
-#include "../state.hpp"
 #include "../glue/texture.hpp"
 
 const float UP_SCALE  = (16.f/15.f);
@@ -34,6 +34,7 @@ void dec(float low, float& f)
         f *= DOWN_SCALE;
 }
 
+#if 0
 static
 void inc(int& i, int high)
 {
@@ -47,6 +48,7 @@ void dec(int low, int& i)
     if (low < i)
         i--;
 }
+#endif
 
 static
 void toggle(bool& b)
@@ -55,13 +57,13 @@ void toggle(bool& b)
 }
 
 
-Drawing *root_object = nullptr;
-Mesh *the_mesh = nullptr;
+Scene *root_scene = nullptr;
 
 float rho;
 Radians theta, phi;
 int sx, sy;
 bool pause;
+vec3 axis;
 
 static
 void reset()
@@ -69,6 +71,10 @@ void reset()
     rho = 5;
     theta = Degrees(45);
     phi = Degrees(45);
+
+    for (auto& model : root_scene->models)
+        model.orientation = quat(Degrees(0), {0, 0, 1});
+    axis = {0, 0, 1};
 }
 
 static
@@ -121,23 +127,12 @@ void display()
     checkOpenGLError();
     printf("Drawing:\n");
     printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
-    printf("    shininess exponent: %d\n", encv::materialShininess);
     printf("\n");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    encv::ModelView = mat4();
-    encv::ModelView.lookat(
-            rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi)),
-            {0, 0, 0},
-            {0, 0, 1});
-    encv::Projection = mat4();
-    // no matter what I do, this seems to break down when rho < about 150
-    encv::Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
-    encv::TextureMatrix = mat4();
-    if (root_object)
+    if (root_scene)
     {
         static int last_time = 0;
-        static quat rot = quat(Degrees(0), {0, 0, 1});
         if (pause)
             last_time = 0;
         else if (last_time == 0)
@@ -147,13 +142,25 @@ void display()
             int this_time = glutGet(GLUT_ELAPSED_TIME);
             Degrees angle = Degrees((this_time - last_time) / 50.0f);
             last_time = this_time;
-            rot *= quat(angle, {0, 0, 1});
+
+            quat rot(angle, axis);
             rot.norm();
+            for (auto& model : root_scene->models)
+            {
+                model.orientation *= rot;
+                model.orientation.norm();
+            }
         }
-        encv::View = encv::ModelView;
-        SavingMatrix sav(encv::ModelView);
-        encv::ModelView *= rot;
-        root_object->draw();
+
+        Context ctx;
+        ctx.ModelView = mat4();
+        ctx.ModelView.lookat(
+                rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi)),
+                {0, 0, 0},
+                {0, 0, 1});
+        ctx.Projection = mat4();
+        ctx.Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
+        root_scene->draw(ctx);
     }
     glutSwapBuffers();
     checkOpenGLError();
@@ -190,8 +197,15 @@ void keyboard(unsigned char key, int, int)
     case '0':
         reset();
         break;
-    case 'e': dec(1, encv::materialShininess); break;
-    case 'E': inc(encv::materialShininess, 50); break;
+    case 'x':
+        axis = {1, 0, 0};
+        break;
+    case 'y':
+        axis = {0, 1, 0};
+        break;
+    case 'z':
+        axis = {0, 0, 1};
+        break;
     default:
         return;
     }
@@ -223,30 +237,30 @@ void init_glut(int& argc, char **argv)
 int main(int argc, char **argv)
 {
     init_glut(argc, argv);
-    if (argc != 2)
+    if (argc < 2)
     {
-        printf("Usage: %s <mesh-file>\n", argv[0]);
+        printf("Usage: %s <mesh-file ...>\n", argv[0]);
         return 1;
     }
     TextureVertexShader tvs;
     TextureFragmentShader tfs;
-    TextureProgram tp(&tvs, &tfs);
-    Mesh mesh(&tp, silly_parse(std::ifstream(argv[1])));
-    root_object = &mesh;
-    the_mesh = &mesh;
+    NewTextureProgram tp(&tvs, &tfs);
 
-    checkOpenGLError();
-    sampler2D earth_lights(0, Bmp("data/earthlights1k.bmp"));
-    sampler2D earth_map(1, Bmp("data/earthmap1k.bmp"));
-    sampler2D earth_specular(2, Bmp("data/earthspec1k.bmp"));
-    checkOpenGLError();
+    Scene scene;
+    for (int i = 1; i < argc; ++i)
+    {
+        PositionedModel mesh;
+        int o = 2 * i - argc;
+        mesh.offset = vec3(o, 0, -o);
+        mesh.scale = 1.0f;
+        mesh.orientation = quat();
+        mesh.model = make_unique<Mesh>(&tp, silly_parse(std::ifstream(argv[i])));
+        scene.models.push_back(std::move(mesh));
+    }
+    scene.light.position = vec4(1, 1, 1, 1.0);
+    scene.light.color = vec4(1.0, 1.0, 1.0, 1.0);
+    root_scene = &scene;
 
-    encv::ambient_texture = &earth_lights;
-    encv::diffuse_texture = &earth_map;
-    encv::specular_texture = &earth_specular;
-
-    // the donut is reddish, so make the background the opposite
-    // this also makes the dark parts of the mesh visible
     glClearColor(0.0, 0.1, 0.1, 1.0);
 
     glEnable(GL_CULL_FACE);
@@ -262,7 +276,6 @@ int main(int argc, char **argv)
 
     glutMainLoop();
 
-    the_mesh = nullptr;
-    root_object = nullptr;
+    root_scene = nullptr;
     puts("Everything is OK");
 }

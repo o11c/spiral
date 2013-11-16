@@ -1,14 +1,23 @@
 #include "mesh.hpp"
 
+#include "../bmp.hpp"
 #include "../glue/gl_wrap.hpp"
+#include "../lieu/mem.hpp"
 #include "../math/vector.hpp"
 
-Mesh::Mesh(TextureProgram *tp, YamlMesh ym)
+Mesh::Mesh(NewTextureProgram *tp, YamlMesh ym)
 : texture_program(tp)
+, material(make_unique<Material>())
 {
+    // TODO see if I can get rid of the numbers (auto-generate in Program load?)
+    material->ambient = make_unique<sampler2D>(0, Bmp(ym.textures["ambient"].filename.c_str()));
+    material->diffuse = make_unique<sampler2D>(1, Bmp(ym.textures["diffuse"].filename.c_str()));
+    material->specular = make_unique<sampler2D>(2, Bmp(ym.textures["specular"].filename.c_str()));
+    //material->normal = make_unique<sampler2D>(3, Bmp(ym.textures["normal"].filename.c_str()));
+    material->shininess = 10;
+
     glGenBuffers(4, &mesh_points);
 
-    // textures ignored for now
     size_t N = ym.vertices.size();
     size_t M = ym.faces.size();
     vec3 poses[N];
@@ -51,9 +60,9 @@ Mesh::~Mesh()
     glDeleteBuffers(4, &mesh_points);
 }
 
-void Mesh::draw()
+void Mesh::draw(Context& ctx)
 {
-    texture_program->load();
+    texture_program->load(ctx, *material);
 
     glEnableVertexAttribArray(texture_program->vertexPositionAttribute);
     glEnableVertexAttribArray(texture_program->vertexNormalAttribute);
