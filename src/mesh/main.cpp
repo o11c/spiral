@@ -23,18 +23,23 @@ const float DOWN_SCALE = (15.f/16.f);
 static
 void inc(float& f, float high)
 {
-    if (f < high)
-        f *= UP_SCALE;
+    float v = f * UP_SCALE;
+    if (v < high)
+        f = v;
+    else
+        f = high;
 }
 
 static
 void dec(float low, float& f)
 {
-    if (low < f)
-        f *= DOWN_SCALE;
+    float v = f * DOWN_SCALE;
+    if (low < v)
+        f = v;
+    else
+        f = low;
 }
 
-#if 0
 static
 void inc(int& i, int high)
 {
@@ -48,7 +53,6 @@ void dec(int low, int& i)
     if (low < i)
         i--;
 }
-#endif
 
 static
 void toggle(bool& b)
@@ -64,6 +68,7 @@ Radians theta, phi;
 int sx, sy;
 bool pause_;
 vec3 axis;
+int view;
 
 static
 void reset()
@@ -75,6 +80,7 @@ void reset()
     for (auto& model : root_scene->models)
         model.orientation = quat(Degrees(0), {0, 0, 1});
     axis = {0, 0, 1};
+    view = 40;
 }
 
 static
@@ -159,7 +165,7 @@ void display()
                 {0, 0, 0},
                 {0, 0, 1});
         ctx.Projection = mat4();
-        ctx.Projection.perspective(Degrees(40), 1, rho / 50, rho * 2);
+        ctx.Projection.perspective(Degrees(view), 1, rho / 50, rho * 2);
         root_scene->draw(ctx);
     }
     glutSwapBuffers();
@@ -197,6 +203,8 @@ void keyboard(unsigned char key, int, int)
     case '0':
         reset();
         break;
+    case '-': inc(view, 90); break;
+    case '+': dec(1, view); break;
     case 'x':
         axis = {1, 0, 0};
         break;
