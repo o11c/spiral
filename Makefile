@@ -18,7 +18,15 @@ override CXXFLAGS += -fvisibility=hidden
 WARNINGS := -Wall -Wextra -Wformat -Wunused
 WARNINGS += -Werror=missing-declarations -Werror=redundant-decls
 
-override LDLIBS += -lglut `pkg-config --libs gl`
+
+ifeq "$(shell uname)" "Darwin"
+GLUT_LIB = -framework GLUT
+GL_LIB = -framework OpenGL -framework Cocoa
+else
+GLUT_LIB = -lglut
+GL_LIB = `pkg-config --libs gl`
+endif
+override LDLIBS += ${GLUT_LIB} ${GL_LIB}
 
 MKDIR_FIRST = @mkdir -p ${@D}
 
@@ -33,7 +41,7 @@ obj/%.d: src/%.cpp
 	$(MKDIR_FIRST)
 	${CXX} ${CPPFLAGS} ${CXXFLAGS} -MG -MP -MM $< \
 	    -MT '$(patsubst %.d,%.o,$@) $@' \
-	    | sed -e 's:[^ ]*\.glsl\.\(h\|def\):src/shaders/&:g;s:src/shaders/src/:src/:g' \
+	    | sed -e 's: \([^ /]*\.glsl\.\(h\|def\)\):src/shaders/\1:g' \
 	    > $@
 
 obj/%.o: src/%.cpp
@@ -43,7 +51,10 @@ obj/%.o: src/%.cpp
 %.glsl.h: %.glsl
 	sed -e 's/^/"/;s/$$/\\n"/' < $< > $@
 %.glsl.def: %.glsl
-	sed -ne 's/^uniform \([^ ]*\) \([^ ]*\);$$/UNIFORM(\2, \1)/;s/^attribute \([^ ]*\) \([^ ]*\);$$/ATTRIBUTE(\2, \1)/;T;p' < $< > $@
+	sed -n	\
+	    -e '/^uniform/{s/^uniform \([^ ]*\) \([^ ]*\);$$/UNIFORM(\2, \1)/;p;}' \
+	    -e '/^attribute/{s/^attribute \([^ ]*\) \([^ ]*\);$$/ATTRIBUTE(\2, \1)/;p;}' \
+	    < $< > $@
 
 include ${DEPENDS}
 

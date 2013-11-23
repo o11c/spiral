@@ -23,8 +23,8 @@ vec3 phony_color(vec2 st)
 
     if (true)
     {
-        float s_ = s * radians(360);
-        float t_ = t * radians(360);
+        float s_ = s * radians(360.0);
+        float t_ = t * radians(360.0);
         float ct = (cos(t_) + 1.0) / 2.0;
         float ss = (sin(s_) + 1.0) / 2.0;
         float cs = (cos(s_) + 1.0) / 2.0;
