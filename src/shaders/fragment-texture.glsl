@@ -10,14 +10,34 @@ uniform vec3 ambientLight;
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
 
+// Note: these are only applied to the 'diffuse' texture right now.
+// It is a very bad idea to apply a non-zero low to ambient
+// since these get added from each light type
+const vec3 red0 = vec3(0.0, 0.0, 0.0);
+const vec3 red1 = vec3(1.0, 0.0, 0.0);
+const vec3 green0 = vec3(0.0, 0.0, 0.0);
+const vec3 green1 = vec3(0.0, 1.0, 0.0);
+const vec3 blue0 = vec3(0.0, 0.0, 0.0);
+const vec3 blue1 = vec3(0.0, 0.0, 1.0);
+
+vec3 dye(vec3 c)
+{
+    return mix(red0, red1, c.r)
+        + mix(green0, green1, c.g)
+        + mix(blue0, blue1, c.b);
+}
+
 vec3 color_ambient(vec4 coord)
 {
-    return texture2DProj(ambient_texture, coord).rgb;
+    vec3 c = texture2DProj(ambient_texture, coord).rgb;
+    // return dye(c);
+    return c;
 }
 
 vec3 color_diffuse(vec4 coord)
 {
-    return texture2DProj(diffuse_texture, coord).rgb;
+    vec3 c = texture2DProj(diffuse_texture, coord).rgb;
+    return dye(c);
 }
 
 vec3 color_specular(vec4 coord)

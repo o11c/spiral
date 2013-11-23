@@ -1,10 +1,48 @@
 #include "dumb.hpp"
 
+#include <fstream>
+
 static __attribute__((noreturn))
 void fail(const char *msg)
 {
     fprintf(stderr, "Fatal: %s\n", msg);
     exit(1);
+}
+
+static
+float parse_float(std::string line)
+{
+    const char *start = line.c_str();
+    char *end;
+    float out = strtof(start, &end);
+    if (start == end)
+        fail("float");
+    if (*end)
+        fail("sink");
+    return out;
+}
+
+static
+vec3 parse_vec3(std::string line)
+{
+    vec3 out;
+    if (line.front() != '[' || line.back() != ']')
+        fail("expect direct list");
+    line.back() = ',';
+    const char *start = line.c_str() + 1;
+    char *end;
+    for (int i = 0; i < 3; ++i)
+    {
+        out.data[i] = strtof(start, &end);
+        if (start == end)
+            fail("expect float");
+        if (*end != ',')
+            fail("expect sep");
+        start = end + 1;
+    }
+    if (end != &line.back())
+        fail("expect no more");
+    return out;
 }
 
 static
@@ -53,7 +91,7 @@ ivec3 parse_ivec3(std::string line)
     return out;
 }
 
-YamlMesh silly_parse(std::istream& in)
+YamlMesh parse_mesh(std::istream& in)
 {
     enum class Mode
     {
@@ -142,6 +180,95 @@ YamlMesh silly_parse(std::istream& in)
                 fail("unexpected indent");
             }
         }
+    }
+    return out;
+}
+
+YamlMulti parse_multi(std::istream& in)
+{
+    YamlMulti out;
+    std::string line;
+    while (std::getline(in, line))
+    {
+        line = line.substr(0, line.find('#'));
+        size_t first = line.find_first_not_of(" ");
+        if (first == std::string::npos)
+            continue;
+        if (line[first] == '-')
+        {
+            line[first] = ' ';
+            if (first)
+                fail("indented list");
+            out.meshes.emplace_back();
+            first = line.find_first_not_of(" ");
+            if (first == std::string::npos)
+                continue;
+        }
+        if (out.meshes.empty())
+            fail("untangled");
+        line = line.substr(first);
+        if (!first)
+            fail("unindented key");
+        size_t colon = line.find(':');
+        if (colon == std::string::npos)
+            fail("I'm lost");
+        size_t nspc = line.find_first_not_of(" ", colon + 1);
+        if (nspc == std::string::npos)
+            fail("not an entity");
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(nspc);
+        if (key == "mesh")
+            out.meshes.back().mesh = parse_mesh(std::ifstream(value));
+        else if (key == "position")
+            out.meshes.back().position = parse_vec3(value);
+        else if (key == "scale")
+            out.meshes.back().scale = parse_float(value);
+        else if (key == "about")
+            out.meshes.back().orient_axis = parse_vec3(value);
+        else if (key == "angle")
+            out.meshes.back().orient_angle = parse_float(value);
+        else
+            fail("locked");
+    }
+    return out;
+}
+
+YamlScene parse_scene(std::istream& in)
+{
+    YamlScene out;
+    std::string line;
+    while (std::getline(in, line))
+    {
+        line = line.substr(0, line.find('#'));
+        size_t first = line.find_first_not_of(" ");
+        if (first == std::string::npos)
+            continue;
+        if (line[first] == '-')
+            fail("discharge");
+        line = line.substr(first);
+        if (first)
+            fail("datcharge");
+
+        size_t colon = line.find(':');
+        if (colon == std::string::npos)
+            fail("boring");
+        size_t nspc = line.find_first_not_of(" ", colon + 1);
+        if (nspc == std::string::npos)
+            fail("moron");
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(nspc);
+        if (key == "multi")
+            out.multi = parse_multi(std::ifstream(value));
+        else if (key == "camera")
+            out.camera = parse_vec3(value);
+        else if (key == "look")
+            out.look = parse_vec3(value);
+        else if (key == "light_position")
+            out.light.position = parse_vec3(value);
+        else if (key == "light_color")
+            out.light.color = parse_vec3(value);
+        else
+            fail("safe");
     }
     return out;
 }

@@ -113,6 +113,8 @@ inline bool operator <= (Radians l, Radians r)
 inline bool operator >= (Radians l, Radians r)
 { return l.value() >= r.value(); }
 
+inline Radians operator - (Radians r)
+{ return Radians(-r.value()); }
 inline Radians operator + (Radians l, Radians r)
 { return Radians(l.value() + r.value()); }
 inline Radians operator - (Radians l, Radians r)

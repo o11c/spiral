@@ -35,8 +35,43 @@ struct YamlMesh
     std::vector<YamlFace> faces;
 };
 
-YamlMesh silly_parse(std::istream& in);
+struct YamlOrientedMesh
+{
+    YamlMesh mesh;
+    vec3 position;
+    float scale;
+    vec3 orient_axis;
+    float orient_angle;
+};
+
+struct YamlLight
+{
+    vec3 position;
+    vec3 color;
+};
+
+struct YamlMulti
+{
+    std::vector<YamlOrientedMesh> meshes;
+};
+
+struct YamlScene
+{
+    YamlMulti multi;
+    YamlLight light;
+    vec3 camera, look;
+};
+
+YamlMesh parse_mesh(std::istream& in);
 inline
-YamlMesh silly_parse(std::istream&& in) { return silly_parse(in); }
+YamlMesh parse_mesh(std::istream&& in) { return parse_mesh(in); }
+
+YamlMulti parse_multi(std::istream& in);
+inline
+YamlMulti parse_multi(std::istream&& in) { return parse_multi(in); }
+
+YamlScene parse_scene(std::istream& in);
+inline
+YamlScene parse_scene(std::istream&& in) { return parse_scene(in); }
 
 #endif //YAML_DUMB_HPP

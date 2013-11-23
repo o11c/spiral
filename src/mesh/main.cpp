@@ -66,9 +66,21 @@ Scene *root_scene = nullptr;
 float rho;
 Radians theta, phi;
 int sx, sy;
-bool pause_;
+bool pause_ = true;
 vec3 axis;
 int view;
+vec3 camera_position;
+quat camera_orientation;
+
+static
+void camera_compat()
+{
+    camera_position = rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi));
+    camera_orientation =
+        quat(Degrees(-90), {0, 0, 1})
+        * quat(-phi, {0, 1, 0})
+        * quat(-theta, {0, 0, 1});
+}
 
 static
 void reset()
@@ -81,6 +93,8 @@ void reset()
         model.orientation = quat(Degrees(0), {0, 0, 1});
     axis = {0, 0, 1};
     view = 40;
+
+    camera_compat();
 }
 
 static
@@ -94,6 +108,7 @@ void drag(int x, int y)
     Radians epsilon = Radians(std::numeric_limits<float>::epsilon() * M_PI);
     if (phi < epsilon) phi = epsilon;
     if (phi > Radians(M_PI) - epsilon) phi = Radians(M_PI) - epsilon;
+    camera_compat();
     glutPostRedisplay();
     sx = x;
     sy = y;
@@ -107,12 +122,14 @@ void mouse(int button, int state, int x, int y)
     if (button == 3)
     {
         dec(1e0, rho);
+        camera_compat();
         glutPostRedisplay();
         return;
     }
     if (button == 4)
     {
         inc(rho, 1e4);
+        camera_compat();
         glutPostRedisplay();
         return;
     }
@@ -132,7 +149,8 @@ void display()
 {
     checkOpenGLError();
     printf("Drawing:\n");
-    printf("    (ρ, θ, φ) = (%f, %f, %f)\n", rho, theta.value(), phi.value());
+    printf("    (ρ, θ, φ), fov = (%f, %f, %f), %d\n", rho, theta.value(), phi.value(), view);
+    printf("    axis = (%f, %f, %f)%s\n", axis.x, axis.y, axis.z, pause_ ? " (paused)" : "");
     printf("\n");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,10 +178,8 @@ void display()
 
         Context ctx;
         ctx.ModelView = mat4();
-        ctx.ModelView.lookat(
-                rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi)),
-                {0, 0, 0},
-                {0, 0, 1});
+        ctx.ModelView *= camera_orientation;
+        ctx.ModelView.translate(-camera_position);
         ctx.Projection = mat4();
         ctx.Projection.perspective(Degrees(view), 1, rho / 50, rho * 2);
         root_scene->draw(ctx);
@@ -245,28 +261,34 @@ void init_glut(int& argc, char **argv)
 int main(int argc, char **argv)
 {
     init_glut(argc, argv);
-    if (argc < 2)
+    if (argc != 2)
     {
-        printf("Usage: %s <mesh-file ...>\n", argv[0]);
+        printf("Usage: %s <scene-file>\n", argv[0]);
         return 1;
     }
+
     TextureVertexShader tvs;
     TextureFragmentShader tfs;
     NewTextureProgram tp(&tvs, &tfs);
 
     Scene scene;
-    for (int i = 1; i < argc; ++i)
     {
-        PositionedModel mesh;
-        int o = 2 * i - argc;
-        mesh.offset = vec3(o, 0, -o);
-        mesh.scale = 1.0f;
-        mesh.orientation = quat();
-        mesh.model = make_unique<Mesh>(&tp, silly_parse(std::ifstream(argv[i])));
-        scene.models.push_back(std::move(mesh));
+        YamlScene yscene = parse_scene(std::ifstream(argv[1]));
+        for (auto& ymesh : yscene.multi.meshes)
+        {
+            PositionedModel mesh;
+            mesh.offset = ymesh.position;
+            mesh.scale = ymesh.scale;
+            mesh.orientation = quat(Degrees(ymesh.orient_angle), ymesh.orient_axis);
+            mesh.model = make_unique<Mesh>(&tp, ymesh.mesh);
+            scene.models.push_back(std::move(mesh));
+        }
+        scene.light.position = vec4(yscene.light.position, 1.0);
+        scene.light.color = vec4(yscene.light.color, 1.0);
+        // TODO change camera control
+        (void)yscene.camera;
+        (void)yscene.look;
     }
-    scene.light.position = vec4(1, 1, 1, 1.0);
-    scene.light.color = vec4(1.0, 1.0, 1.0, 1.0);
     root_scene = &scene;
 
     glClearColor(0.0, 0.1, 0.1, 1.0);
@@ -276,9 +298,6 @@ int main(int argc, char **argv)
 
     checkOpenGLError();
     reset();
-    for (int i = 1; i < argc; ++i)
-        for (char *a = argv[i]; *a; ++a)
-            keyboard(*a, 0, 0);
 
     checkOpenGLError();
 
