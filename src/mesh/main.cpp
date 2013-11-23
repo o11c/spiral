@@ -17,6 +17,7 @@
 #include "mesh.hpp"
 #include "../glue/texture.hpp"
 
+#if 0
 const float UP_SCALE  = (16.f/15.f);
 const float DOWN_SCALE = (15.f/16.f);
 
@@ -39,6 +40,7 @@ void dec(float low, float& f)
     else
         f = low;
 }
+#endif
 
 static
 void inc(int& i, int high)
@@ -63,8 +65,6 @@ void toggle(bool& b)
 
 Scene *root_scene = nullptr;
 
-float rho;
-Radians theta, phi;
 int sx, sy;
 bool pause_ = true;
 vec3 axis;
@@ -73,28 +73,33 @@ vec3 camera_position;
 quat camera_orientation;
 
 static
-void camera_compat()
+vec3 backward()
 {
-    camera_position = rho * vec3(sin_(phi) * cos_(theta), sin_(phi) * sin_(theta), cos_(phi));
-    camera_orientation =
-        quat(Degrees(-90), {0, 0, 1})
-        * quat(-phi, {0, 1, 0})
-        * quat(-theta, {0, 0, 1});
+    return (mat4(-camera_orientation) * vec4{0, 0, 1, 1}).xyz;
+}
+
+static
+vec3 up()
+{
+    return (mat4(-camera_orientation) * vec4{0, 1, 0, 1}).xyz;
+}
+
+static
+vec3 right()
+{
+    return (mat4(-camera_orientation) * vec4{1, 0, 0, 1}).xyz;
 }
 
 static
 void reset()
 {
-    rho = 5;
-    theta = Degrees(45);
-    phi = Degrees(45);
-
     for (auto& model : root_scene->models)
         model.orientation = quat(Degrees(0), {0, 0, 1});
     axis = {0, 0, 1};
     view = 40;
 
-    camera_compat();
+    camera_position = {0, 0, 0};
+    camera_orientation = quat(Degrees(0), {0, 0, 1});
 }
 
 static
@@ -103,12 +108,11 @@ void drag(int x, int y)
     if (x == sx and y == sy)
         return;
     // one degree per pixel should be manageable
-    theta -= Degrees(x - sx);
-    phi -= Degrees(y - sy);
-    Radians epsilon = Radians(std::numeric_limits<float>::epsilon() * M_PI);
-    if (phi < epsilon) phi = epsilon;
-    if (phi > Radians(M_PI) - epsilon) phi = Radians(M_PI) - epsilon;
-    camera_compat();
+    auto theta = Degrees(x - sx);
+    auto phi = Degrees(y - sy);
+    camera_orientation *= quat(theta, up());
+    camera_orientation *= quat(phi, right());
+    camera_orientation.norm();
     glutPostRedisplay();
     sx = x;
     sy = y;
@@ -121,15 +125,17 @@ void mouse(int button, int state, int x, int y)
     // they are always delivered as button events
     if (button == 3)
     {
-        dec(1e0, rho);
-        camera_compat();
+        if (state == GLUT_UP)
+            return;
+        camera_position -= backward();
         glutPostRedisplay();
         return;
     }
     if (button == 4)
     {
-        inc(rho, 1e4);
-        camera_compat();
+        if (state == GLUT_UP)
+            return;
+        camera_position += backward();
         glutPostRedisplay();
         return;
     }
@@ -148,8 +154,15 @@ static
 void display()
 {
     checkOpenGLError();
+    auto c = camera_position;
+    auto r = right();
+    auto u = up();
+    auto b = backward();
     printf("Drawing:\n");
-    printf("    (ρ, θ, φ), fov = (%f, %f, %f), %d\n", rho, theta.value(), phi.value(), view);
+    printf("    (x, y, z), fov = (%f, %f, %f), %d\n", c.x, c.y, c.z, view);
+    printf("    right = (%f, %f, %f)\n", r.x, r.y, r.z);
+    printf("    up = (%f, %f, %f)\n", u.x, u.y, u.z);
+    printf("    backward = (%f, %f, %f)\n", b.x, b.y, b.z);
     printf("    axis = (%f, %f, %f)%s\n", axis.x, axis.y, axis.z, pause_ ? " (paused)" : "");
     printf("\n");
 
@@ -181,7 +194,7 @@ void display()
         ctx.ModelView *= camera_orientation;
         ctx.ModelView.translate(-camera_position);
         ctx.Projection = mat4();
-        ctx.Projection.perspective(Degrees(view), 1, rho / 50, rho * 2);
+        ctx.Projection.perspective(Degrees(view), 1, 0.01, 100);
         root_scene->draw(ctx);
     }
     glutSwapBuffers();
@@ -221,6 +234,12 @@ void keyboard(unsigned char key, int, int)
         break;
     case '-': inc(view, 90); break;
     case '+': dec(1, view); break;
+    case 'h': camera_position -= right(); break;
+    case 'l': camera_position += right(); break;
+    case 'j': camera_position -= up(); break;
+    case 'k': camera_position += up(); break;
+    case 'u': camera_orientation *= quat(Degrees(-1), backward()); break;
+    case 'i': camera_orientation *= quat(Degrees(1), backward()); break;
     case 'x':
         axis = {1, 0, 0};
         break;
@@ -242,8 +261,7 @@ void init_glut(int& argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(500,500);
-    glutInitWindowPosition(10,10);
-    glutCreateWindow("Meshquadric");
+    glutCreateWindow("Scene");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);

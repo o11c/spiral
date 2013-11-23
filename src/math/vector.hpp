@@ -147,7 +147,9 @@ public:
 
 
 vec3 operator + (const vec3&, const vec3&);
+vec3& operator += (vec3&, const vec3&);
 vec3 operator - (const vec3&, const vec3&);
+vec3& operator -= (vec3&, const vec3&);
 vec3 operator -(const vec3&);
 vec3& operator *= (vec3&, float);
 vec3 operator * (vec3, float);

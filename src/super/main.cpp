@@ -101,12 +101,16 @@ void mouse(int button, int state, int x, int y)
     // they are always delivered as button events
     if (button == 3)
     {
+        if (state == GLUT_UP)
+            return;
         dec(1e0, rho);
         glutPostRedisplay();
         return;
     }
     if (button == 4)
     {
+        if (state == GLUT_UP)
+            return;
         inc(rho, 1e4);
         glutPostRedisplay();
         return;

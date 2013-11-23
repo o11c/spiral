@@ -74,3 +74,13 @@ void quat::norm()
         w *= s;
     }
 }
+
+quat operator - (const quat& r)
+{
+    quat out;
+    out.x = -r.x;
+    out.y = -r.y;
+    out.z = -r.z;
+    out.w = r.w;
+    return out;
+}

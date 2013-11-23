@@ -14,7 +14,7 @@ Mesh::Mesh(NewTextureProgram *tp, YamlMesh ym)
     material->diffuse = make_unique<sampler2D>(1, Bmp(ym.textures["diffuse"].filename.c_str()));
     material->specular = make_unique<sampler2D>(2, Bmp(ym.textures["specular"].filename.c_str()));
     //material->normal = make_unique<sampler2D>(3, Bmp(ym.textures["normal"].filename.c_str()));
-    material->shininess = 10;
+    material->shininess = 100;
 
     glGenBuffers(4, &mesh_points);
 

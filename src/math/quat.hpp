@@ -26,5 +26,6 @@ public:
 
 quat operator * (const quat& l, const quat& r);
 quat& operator *= (quat& l, const quat& r);
+quat operator - (const quat& r);
 
 #endif //QUAT_HPP
