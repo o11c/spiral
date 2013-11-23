@@ -41,7 +41,7 @@ obj/%.d: src/%.cpp
 	$(MKDIR_FIRST)
 	${CXX} ${CPPFLAGS} ${CXXFLAGS} -MG -MP -MM $< \
 	    -MT '$(patsubst %.d,%.o,$@) $@' \
-	    | sed -e 's: \([^ /]*\.glsl\.\(h\|def\)\):src/shaders/\1:g' \
+	    | sed -e 's: \([^ /]*\.glsl\.\(h\|def\)\): src/shaders/\1:g' \
 	    > $@
 
 obj/%.o: src/%.cpp
