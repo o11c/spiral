@@ -37,12 +37,14 @@ all: ${PROGRAMS}
 
 clean:
 	rm -rf obj/ bin/
+ifndef MAKE_RESTARTS
 obj/%.d: src/%.cpp
 	$(MKDIR_FIRST)
 	${CXX} ${CPPFLAGS} ${CXXFLAGS} -MG -MP -MM $< \
 	    -MT '$(patsubst %.d,%.o,$@) $@' \
 	    | sed -e 's: \([^ /]*\.glsl\.\(h\|def\)\): src/shaders/\1:g' \
 	    > $@
+endif
 
 obj/%.o: src/%.cpp
 	$(MKDIR_FIRST)
