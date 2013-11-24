@@ -20,6 +20,7 @@ WARNINGS += -Werror=missing-declarations -Werror=redundant-decls
 
 
 ifeq "$(shell uname)" "Darwin"
+CXX += -stdlib=libc++
 GLUT_LIB = -framework GLUT
 GL_LIB = -framework OpenGL -framework Cocoa
 else
