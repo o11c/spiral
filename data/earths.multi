@@ -1,0 +1,10 @@
+- mesh: data/super-0.0000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh
+  position: [0, 0, 0]
+  scale: 1
+  about: [1, 0, 0]
+  angle: 90
+- mesh: data/super-1.5000000000e+00-2.0000000000e+00,2.0000000000e+00-32,32.mesh
+  position: [0, 0, 5]
+  scale: 2
+  about: [0, 0, 1]
+  angle: 90

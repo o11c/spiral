@@ -83,15 +83,6 @@ vec3 right()
 }
 
 static
-void reset()
-{
-    view = 40;
-
-    camera_position = {0, 0, 0};
-    camera_orientation = quat(Degrees(0), {0, 0, 1});
-}
-
-static
 void drag(int x, int y)
 {
     if (x == sx and y == sy)
@@ -192,9 +183,6 @@ void keyboard(unsigned char key, int, int)
     case '\e':
         glutLeaveMainLoop();
         return;
-    case '0':
-        reset();
-        break;
     case '-': inc(view, 90); break;
     case '+': dec(1, view); break;
     case 'h': camera_position -= right(); break;
@@ -203,6 +191,12 @@ void keyboard(unsigned char key, int, int)
     case 'k': camera_position += up(); break;
     case 'u': camera_orientation *= quat(Degrees(-1), backward()); break;
     case 'i': camera_orientation *= quat(Degrees(1), backward()); break;
+    case 'x': camera_position.x--; break;
+    case 'X': camera_position.x++; break;
+    case 'y': camera_position.y--; break;
+    case 'Y': camera_position.y++; break;
+    case 'z': camera_position.z--; break;
+    case 'Z': camera_position.z++; break;
     default:
         return;
     }
@@ -251,8 +245,14 @@ int main(int argc, char **argv)
         scene.light.position = vec4(yscene.light.position, 1.0);
         scene.light.color = vec4(yscene.light.color, 1.0);
         // TODO change camera control
-        (void)yscene.camera;
-        (void)yscene.look;
+        camera_position = yscene.camera;
+        vec3 delta = yscene.look - yscene.camera;
+        // It looks like I'm getting the arguments of atan2 backwards,
+        // but that's the way the math turns out.
+        Radians theta(atan2f(delta.x, delta.y));
+        Radians phi(atan2f(hypotf(delta.x, delta.y), -delta.z));
+
+        camera_orientation = quat(-phi, {1, 0, 0}) * quat(-theta, {0, 0, -1});
     }
     root_scene = &scene;
 
@@ -262,7 +262,7 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
 
     checkOpenGLError();
-    reset();
+    view = 40;
 
     checkOpenGLError();
 

@@ -1,0 +1,23 @@
+# a tetrahedron, hand-drawn based on a cube
+
+textures:
+  ambient: data/black.bmp
+  diffuse: data/webtreats_wood-pattern4-1024.bmp
+  specular: data/white.bmp
+
+vertices:
+  - position:   [-10, -10, 0, 1]
+    texture:    [0, 0, 0, 1]
+    normal:     [0, 0, 1, 1]
+  - position:   [-10, 10, 0, 1]
+    texture:    [0, 1, 0, 1]
+    normal:     [0, 0, 1, 1]
+  - position:   [10, -10, 0, 1]
+    texture:    [1, 0, 0, 1]
+    normal:     [0, 0, 1, 1]
+  - position:   [10, 10, 0, 1]
+    texture:    [1, 1, 0, 1]
+    normal:     [0, 0, 1, 1]
+faces:
+    - [0, 2, 1]
+    - [1, 2, 3]

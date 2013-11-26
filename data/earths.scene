@@ -1,0 +1,5 @@
+camera: [10, 10, 10]
+look: [0, 0, 0]
+light_position: [10, 10, 10]
+light_color: [1, 1, 1]
+mirror: data/earths.mirror
