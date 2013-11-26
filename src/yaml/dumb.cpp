@@ -233,6 +233,40 @@ YamlMulti parse_multi(std::istream& in)
     return out;
 }
 
+YamlMirror parse_mirror(std::istream& in)
+{
+    YamlMirror out;
+    std::string line;
+    while (std::getline(in, line))
+    {
+        line = line.substr(0, line.find('#'));
+        size_t first = line.find_first_not_of(" ");
+        if (first == std::string::npos)
+            continue;
+        if (line[first] == '-')
+            fail("shatter");
+        line = line.substr(first);
+        if (first)
+            fail("shard");
+
+        size_t colon = line.find(':');
+        if (colon == std::string::npos)
+            fail("fuzzy");
+        size_t nspc = line.find_first_not_of(" ", colon + 1);
+        if (nspc == std::string::npos)
+            fail("foggy");
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(nspc);
+        if (key == "surface")
+            out.onto = parse_mesh(std::ifstream(value));
+        else if (key == "multi")
+            out.multi = parse_multi(std::ifstream(value));
+        else
+            fail("danger");
+    }
+    return out;
+}
+
 YamlScene parse_scene(std::istream& in)
 {
     YamlScene out;
@@ -257,8 +291,8 @@ YamlScene parse_scene(std::istream& in)
             fail("moron");
         std::string key = line.substr(0, colon);
         std::string value = line.substr(nspc);
-        if (key == "multi")
-            out.multi = parse_multi(std::ifstream(value));
+        if (key == "mirror")
+            out.mirror = parse_mirror(std::ifstream(value));
         else if (key == "camera")
             out.camera = parse_vec3(value);
         else if (key == "look")

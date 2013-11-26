@@ -55,9 +55,16 @@ struct YamlMulti
     std::vector<YamlOrientedMesh> meshes;
 };
 
+struct YamlMirror
+{
+    YamlMesh onto;
+    YamlMulti multi;
+};
+
+// TODO change to use YamlAny (once it's implemented, of course)
 struct YamlScene
 {
-    YamlMulti multi;
+    YamlMirror mirror;
     YamlLight light;
     vec3 camera, look;
 };
@@ -69,6 +76,10 @@ YamlMesh parse_mesh(std::istream&& in) { return parse_mesh(in); }
 YamlMulti parse_multi(std::istream& in);
 inline
 YamlMulti parse_multi(std::istream&& in) { return parse_multi(in); }
+
+YamlMirror parse_mirror(std::istream& in);
+inline
+YamlMirror parse_mirror(std::istream&& in) { return parse_mirror(in); }
 
 YamlScene parse_scene(std::istream& in);
 inline

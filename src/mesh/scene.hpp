@@ -8,6 +8,9 @@
 #include "../math/quat.hpp"
 #include "../math/vector.hpp"
 #include "../math/matrix.hpp"
+#include "../yaml/dumb.hpp"
+
+class NewTextureProgram;
 
 struct Material
 {
@@ -36,22 +39,31 @@ struct Model
     virtual void draw(Context&) = 0;
 };
 
-struct PositionedModel
+struct PositionedModel : public Model
 {
     vec3 offset;
     float scale;
     quat orientation;
     std::unique_ptr<Model> model;
 public:
-    void draw(Context&);
+    void draw(Context&) override;
+};
+
+struct Multi : public Model
+{
+    std::vector<PositionedModel> models;
+public:
+    Multi(NewTextureProgram *tp, YamlMulti multi);
+
+    void draw(Context&) override;
 };
 
 struct Scene
 {
     Light light;
-    std::vector<PositionedModel> models;
+    std::unique_ptr<Model> model;
 public:
-    void draw(Context&);
+    void draw_scene(Context&);
 };
 
 #endif //SCENE_HPP

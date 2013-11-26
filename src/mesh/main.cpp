@@ -14,7 +14,7 @@
 #include "../glue/error.hpp"
 #include "../lieu/mem.hpp"
 #include "../math/quat.hpp"
-#include "mesh.hpp"
+#include "mirror.hpp"
 #include "../glue/texture.hpp"
 
 #if 0
@@ -56,18 +56,10 @@ void dec(int low, int& i)
         i--;
 }
 
-static
-void toggle(bool& b)
-{
-    b = not b;
-}
-
 
 Scene *root_scene = nullptr;
 
 int sx, sy;
-bool pause_ = true;
-vec3 axis;
 int view;
 vec3 camera_position;
 quat camera_orientation;
@@ -93,9 +85,6 @@ vec3 right()
 static
 void reset()
 {
-    for (auto& model : root_scene->models)
-        model.orientation = quat(Degrees(0), {0, 0, 1});
-    axis = {0, 0, 1};
     view = 40;
 
     camera_position = {0, 0, 0};
@@ -163,44 +152,21 @@ void display()
     printf("    right = (%f, %f, %f)\n", r.x, r.y, r.z);
     printf("    up = (%f, %f, %f)\n", u.x, u.y, u.z);
     printf("    backward = (%f, %f, %f)\n", b.x, b.y, b.z);
-    printf("    axis = (%f, %f, %f)%s\n", axis.x, axis.y, axis.z, pause_ ? " (paused)" : "");
     printf("\n");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (root_scene)
     {
-        static int last_time = 0;
-        if (pause_)
-            last_time = 0;
-        else if (last_time == 0)
-            last_time = glutGet(GLUT_ELAPSED_TIME);
-        else
-        {
-            int this_time = glutGet(GLUT_ELAPSED_TIME);
-            Degrees angle = Degrees((this_time - last_time) / 50.0f);
-            last_time = this_time;
-
-            quat rot(angle, axis);
-            rot.norm();
-            for (auto& model : root_scene->models)
-            {
-                model.orientation *= rot;
-                model.orientation.norm();
-            }
-        }
-
         Context ctx;
         ctx.ModelView = mat4();
         ctx.ModelView *= camera_orientation;
         ctx.ModelView.translate(-camera_position);
         ctx.Projection = mat4();
         ctx.Projection.perspective(Degrees(view), 1, 0.01, 100);
-        root_scene->draw(ctx);
+        root_scene->draw_scene(ctx);
     }
     glutSwapBuffers();
     checkOpenGLError();
-    if (!pause_)
-        glutPostRedisplay();
 }
 
 static
@@ -226,9 +192,6 @@ void keyboard(unsigned char key, int, int)
     case '\e':
         glutLeaveMainLoop();
         return;
-    case ' ':
-        toggle(pause_);
-        break;
     case '0':
         reset();
         break;
@@ -240,15 +203,6 @@ void keyboard(unsigned char key, int, int)
     case 'k': camera_position += up(); break;
     case 'u': camera_orientation *= quat(Degrees(-1), backward()); break;
     case 'i': camera_orientation *= quat(Degrees(1), backward()); break;
-    case 'x':
-        axis = {1, 0, 0};
-        break;
-    case 'y':
-        axis = {0, 1, 0};
-        break;
-    case 'z':
-        axis = {0, 0, 1};
-        break;
     default:
         return;
     }
@@ -259,7 +213,7 @@ static
 void init_glut(int& argc, char **argv)
 {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL | GLUT_DOUBLE);
     glutInitWindowSize(500,500);
     glutCreateWindow("Scene");
     glutDisplayFunc(display);
@@ -292,15 +246,8 @@ int main(int argc, char **argv)
     Scene scene;
     {
         YamlScene yscene = parse_scene(std::ifstream(argv[1]));
-        for (auto& ymesh : yscene.multi.meshes)
-        {
-            PositionedModel mesh;
-            mesh.offset = ymesh.position;
-            mesh.scale = ymesh.scale;
-            mesh.orientation = quat(Degrees(ymesh.orient_angle), ymesh.orient_axis);
-            mesh.model = make_unique<Mesh>(&tp, ymesh.mesh);
-            scene.models.push_back(std::move(mesh));
-        }
+        auto mirror = make_unique<Mirror>(&tp, yscene.mirror.onto, make_unique<Multi>(&tp, yscene.mirror.multi));
+        scene.model = std::move(mirror);
         scene.light.position = vec4(yscene.light.position, 1.0);
         scene.light.color = vec4(yscene.light.color, 1.0);
         // TODO change camera control
