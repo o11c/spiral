@@ -37,6 +37,13 @@ struct Context
 
 struct Model
 {
+    // You would think that these were not necessary,
+    // but gcc 4.7 and clang 3.2 and 3.3 disagree.
+    // There is at least one DR about it.
+    Model() = default;
+    Model(Model&&) = default;
+    Model& operator = (Model&&) = default;
+
     virtual ~Model() {}
     virtual void draw(Context&) = 0;
 };
@@ -48,12 +55,6 @@ struct PositionedModel : public Model
     quat orientation;
     std::unique_ptr<Model> model;
 public:
-    // these should not be necessary, but there are bugs in gcc 4.7
-    // and clang 3.2 and 3.3
-    PositionedModel() = default;
-    PositionedModel(PositionedModel&&) = default;
-    PositionedModel& operator = (PositionedModel&&) = default;
-
     void draw(Context&) override;
 };
 
