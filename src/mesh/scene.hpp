@@ -52,6 +52,7 @@ public:
     // and clang 3.2 and 3.3
     PositionedModel() = default;
     PositionedModel(PositionedModel&&) = default;
+    PositionedModel& operator = (PositionedModel&&) = default;
 
     void draw(Context&) override;
 };
