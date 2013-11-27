@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "../../config.h"
+
 #include "../glue/texture.hpp"
 #include "../math/quat.hpp"
 #include "../math/vector.hpp"
@@ -46,6 +48,11 @@ struct PositionedModel : public Model
     quat orientation;
     std::unique_ptr<Model> model;
 public:
+    // these should not be necessary, but there are bugs in gcc 4.7
+    // and clang 3.2 and 3.3
+    PositionedModel() = default;
+    PositionedModel(PositionedModel&&) = default;
+
     void draw(Context&) override;
 };
 
