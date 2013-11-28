@@ -59,6 +59,7 @@ struct YamlMirror
 {
     YamlMesh onto;
     YamlMulti multi;
+    float ropac;
 };
 
 // TODO change to use YamlAny (once it's implemented, of course)

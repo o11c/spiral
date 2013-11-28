@@ -7,10 +7,11 @@
 class Mirror : public Model
 {
     Mesh surface;
+    float ropac;
     std::vector<vec4> surface_planes;
     std::unique_ptr<Model> reflectee;
 public:
-    Mirror(NewTextureProgram *ntp, YamlMesh surf, std::unique_ptr<Model> obj);
+    Mirror(NewTextureProgram *ntp, YamlMesh surf, float r, std::unique_ptr<Model> obj);
     void draw(Context&) override;
 };
 

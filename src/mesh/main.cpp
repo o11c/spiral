@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     Scene scene;
     {
         YamlScene yscene = parse_scene(std::ifstream(argv[1]));
-        auto mirror = make_unique<Mirror>(&tp, yscene.mirror.onto, make_unique<Multi>(&tp, yscene.mirror.multi));
+        auto mirror = make_unique<Mirror>(&tp, yscene.mirror.onto, yscene.mirror.ropac, make_unique<Multi>(&tp, yscene.mirror.multi));
         scene.model = std::move(mirror);
         scene.light.position = vec4(yscene.light.position, 1.0);
         scene.light.color = vec4(yscene.light.color, 1.0);

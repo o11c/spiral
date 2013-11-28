@@ -261,6 +261,8 @@ YamlMirror parse_mirror(std::istream& in)
             out.onto = parse_mesh(std::ifstream(value));
         else if (key == "multi")
             out.multi = parse_multi(std::ifstream(value));
+        else if (key == "ropac")
+            out.ropac = parse_float(value);
         else
             fail("danger");
     }

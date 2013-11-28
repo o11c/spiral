@@ -18,6 +18,7 @@ public:
     ~Mesh();
 
     void draw(Context&) override;
+    void draw_sub(Context&, unsigned start, unsigned len);
 };
 
 #endif // MESH_HPP

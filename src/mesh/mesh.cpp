@@ -62,6 +62,10 @@ Mesh::~Mesh()
 
 void Mesh::draw(Context& ctx)
 {
+    draw_sub(ctx, 0, face_count);
+}
+void Mesh::draw_sub(Context& ctx, unsigned start, unsigned len)
+{
     texture_program->load(ctx, *material);
 
     glEnableVertexAttribArray(texture_program->vertexPositionAttribute);
@@ -78,7 +82,7 @@ void Mesh::draw(Context& ctx)
         glVertexAttribPointer(texture_program->vertexNormalAttribute, 3, GL_FLOAT, GL_FALSE,
                 0, (GLvoid*) 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_indices);
-        glDrawElements(GL_TRIANGLES, 3 * face_count, GL_UNSIGNED_SHORT, (GLvoid *) 0);
+        glDrawElements(GL_TRIANGLES, 3 * len, GL_UNSIGNED_SHORT, (GLvoid *) (uintptr_t)(6 * start));
     }
     glDisableVertexAttribArray(texture_program->vertexPositionAttribute);
     glDisableVertexAttribArray(texture_program->vertexNormalAttribute);
